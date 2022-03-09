@@ -1,0 +1,34 @@
+{
+    "php-cli-version": "7.4",
+    "composer-version": "2",
+    "folders": [
+        {
+            "source": "~/Desktop/project",
+            "dist": "/var/www/project"
+        }
+    ],
+    "sites": [
+        {
+            "domain": "phpmyadmin.test",
+            "entry-point": "/builds/phpmyadmin/5.1.3",
+            "template": "default.conf",
+            "php-fpm-version": "7.4",
+            "auto_host": true,
+            "auto_ssl": true
+        },
+        {
+            "domain": "welcome.test",
+            "entry-point": "/var/www/project/welcome/public",
+            "template": "default.conf",
+            "php-fpm-version": "7.4",
+            "auto_host": true,
+            "auto_ssl": true
+        }
+    ],
+    "ports": {
+        "80": "80",
+        "443": "443",
+        "3306": "3306",
+        "6379": "6379"
+    }
+}

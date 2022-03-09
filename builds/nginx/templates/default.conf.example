@@ -1,0 +1,36 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name <domain>;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    ssl_certificate "/settings/ssl/<domain>/ssl.crt";
+    ssl_certificate_key "/settings/ssl/<domain>/ssl.key";
+
+    server_name <domain>;
+
+    root "<entry-point>";
+
+    index index.php index.html;
+
+    # cors
+    add_header Access-Control-Allow-Origin '*' always;
+    add_header Access-Control-Allow-Methods 'GET,POST,OPTIONS,PUT,DELETE' always;
+    add_header Access-Control-Allow-Headers '*' always;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        include fastcgi_params;
+        fastcgi_pass unix:/var/run/php/php<php-fpm-version>-fpm.sock;
+        fastcgi_param SCRIPT_FILENAM $document_root$fastcgi_script_name;
+    }
+}
