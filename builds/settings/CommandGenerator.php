@@ -3,6 +3,7 @@
 Class CommandGenerator
 {
     protected $configPath = __DIR__ . '/../../volumes/settings/config.json';
+
     public $config;
 
     public function __construct()
@@ -10,14 +11,11 @@ Class CommandGenerator
         $this->config = json_decode(file_get_contents($this->configPath), true);
     }
 
-    /**
-     * 生成啟動 docker 容器的指令
-     */
     public function generateDockerContainerCommand()
     {
         $pwd = getcwd();
         $command = "docker run --rm -it ";
-        
+
         $ports = $this->config['ports'];
         foreach ($ports as $key => $value) {
             $command .= "-p $key:$value ";
@@ -40,31 +38,25 @@ Class CommandGenerator
         echo $command;
     }
 
-    /**
-     * 設定 /etc/hosts 文件
-     */
     public function configurationHosts()
     {
-        $hostContent = file_get_contents('/etc/hosts');
+        $hosts = file_get_contents('/etc/hosts');
 
-        $sites = $this->config['sites'];
-        
-        foreach ($sites as $site) {
-            $autoHost = $site['auto_host'];
-            if ($autoHost) {
+        foreach ($this->config['sites'] as $site) {
+            if ($site['auto_host']) {
                 $domain = $site['domain'];
-                $record = "127.0.0.1 $domain";
-                if (stristr($hostContent, $record) === false) {
-                    $hostContent .= "\n127.0.0.1 $domain";
+
+                if (count(preg_grep("/^(127.0.0.1)([\s\\t]*)($domain)$/", explode("\n", $hosts))) == 0) {
+                    $hosts .= "\n127.0.0.1 $domain";
                 }
             }
         }
 
-        file_put_contents('/etc/hosts', $hostContent);
+        file_put_contents('/etc/hosts', $hosts);
     }
 
     public function generate()
-    {        
+    {
         $this->configurationHosts();
         $this->generateDockerContainerCommand();
     }
