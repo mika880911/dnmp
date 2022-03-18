@@ -1,88 +1,79 @@
 # DNMP
-Docker 版 LNMP
+LNMP in Docker
 
-## DNMP 集成了哪些東西
-- ubuntu 20.04 基礎鏡像
-- mysql 最新穩定版
-    - 預設帳號：root
-    - 預設密碼：無
-- nginx 最新穩定版
-- reids 最新穩定版
-- phpmyadmin 5.1.3 版
+## DNMP Feature
+- ubuntu：20.04
+- mysql：latest stable
+    - default account：root
+    - default password：無
+- nginx：latest stable
+- reids：latest stable
+- phpmyadmin： 5.1.3
 - php
-    - 5.6 版
-    - 7.0 版
-    - 7.1 版
-    - 7.2 版
-    - 7.3 版
-    - 7.4 版
-    - 8.0 版
-    - 8.1 版
+    - 5.6
+    - 7.0
+    - 7.1
+    - 7.2
+    - 7.3
+    - 7.4
+    - 8.0
+    - 8.1
 
-## php 額外安裝模組列表
-- php-zip
-- php-xml 
-- php-mysql 
-- php-sqlite3
-- php-curl
-- php-redis
-- php-gd
+## Local enviroment require
+- install any version php-cli
+- install docker
 
-## 使用前請確保符合下列環境需求
-- 本機必須先有任一版本 php-cli
-- docker
-
-## 使用教學
-- 初次使用請先構建 image
+## Tutorial
+- first time usage you should make image following command
     ```bash
     ./buildImage.sh
     ```
-- 調整 ./volumes/settings/config.json
+- congiguration ./volumes/settings/config.json
     ```json
     {
-        # 容器內 php-cli 要使用的版本
+        # php-cli-version in container
         "php-cli-version": "7.4",
 
-        # 容器內 composer 要使用的版本，填1或2
+        # composer version in container (1 or 2)
         "composer-version": "2", 
 
-        # 本機目錄映射到容器內部
+        # local folder map to container folder
         "folders": [
             {
-                # 本機目錄路徑
+                # local folder path
                 "source": "~/Desktop/project",
 
-                # 容器目錄路徑，該目錄必須為空或不存在
+                # container folder path, this forder should be empty or not exist
                 "dist": "/var/www/project"
             }
         ],
 
-        # 站點配置
+        # site settings
         "sites": [
             {
-                # 該站點的網域
+                # site domain
                 "domain": "phpmyadmin.test",
 
-                # 該專案入口文件的所在目錄
+                # this project entroy point directory
                 "entry-point": "/builds/phpmyadmin/5.1.3",
                 
-                # 該站點的要套用的 nginx 模板，模板文件在 volumes/settings/templates/nginx 下
+                # which nginx template should use in this site, the template file in volumes/settings/templates/nginx
                 "template": "default.conf",
 
-                # 選擇該站點的 php-fpm 版本
+                # which php-fpm version should use in this site
                 "php-fpm-version": "7.4",
 
-                # 是否要將 domain 新增至 /etc/hosts （容器與本機都會添加)
+                # add domain to your /etc/hosts ?
                 "auto_host": true,
 
-                # 是否要生成自簽憑證
+                # auto create or renew signed ssl ?
                 "auto_ssl": true
             }
         ],
         
-        # 端口映射
+        # local port map to container port
         "ports": {
-            # 本機端口:容器端口
+            # local port:container port
             "80": "80",
             "443": "443",
             "3306": "3306",
@@ -90,24 +81,26 @@ Docker 版 LNMP
         }
     }
     ```
-    - 啟動並進入容器
+    - start and attach to the container
         ```bash
         sudo ./start.sh
         ```
 
-## 替換 ssl 憑證
-考慮到專案可能需要使用正式憑證而非自簽憑證，在這邊提供替換的具體流程
-- step1: 啟動容器
-- step2: 將 volumes/settings/config.json 中站點的 auto_ssl 設定為 false
-- step3: 將憑證放置 volumes/settings/ssl/{網域名稱}，並命名為 ssl.crt 及 ssl.key，若檔案已存在，請直接覆蓋掉
-- step4: 重啟容器
+## How to use formal certificate
+Considering that the site may require use of a formal certificate, following step to setup
 
-## nginx 模板
-考慮到有可能各種專案所需要的站點設定不盡相同，你可以針對特定的專案創建一份專屬的模板，避免每次重啟容器後都需要為站點做微調
-- step1: 在 volumes/settings/templates/nginx 下創建一份合法的 nginx 設定檔
-- step2: 將 volumes/settings/config.json 中站點的 template 設定成在 volumes/settings/templates/nginx 下的文件名稱
-- step3: 重啟容器
+- step1: start container
+- step2: configuration volumes/settings/config.json, let auto_ssl of your site be false
+- step3: put your sll.key and ssl.crt inside volumns/settings/ssl/{domain} folder
+- step4: restart container
 
-## php.ini 修改
-- step1: 在 volumes/settings/templates/php 下，有針對 cli 及 fpm 的設定檔，根據需求做調整
-- step2: 重啟容器
+## How to use nginx template
+Considering each projects may require different nginx settings, you can create a special template for a specific project to avoid the need to fine-tune the site settings every time when container restarted
+
+- step1: inside volumes/settings/templates/nginx create nginx config
+- step2: configuration volumes/settings/config.json, let your site template be template file name in volumes/settings/templates/nginx
+- step3: restart container
+
+## Configuration php.ini
+- step1: inside volumes/settings/templates/php folder have cli and fpm settings file, you can configuration it
+- step2: restart container
