@@ -66,7 +66,7 @@ LNMP in Docker
                 # add domain to your /etc/hosts ?
                 "auto_host": true,
 
-                # auto create or renew signed ssl ?
+                # auto create or renew self-signed ssl ?
                 "auto_ssl": true
             }
         ],
