@@ -5,7 +5,7 @@ LNMP in Docker
 - ubuntu：20.04
 - mysql：latest stable
     - default account：root
-    - default password：無
+    - default password：
 - nginx：latest stable
 - reids：latest stable
 - phpmyadmin： 5.1.3
