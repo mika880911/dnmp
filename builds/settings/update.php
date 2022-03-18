@@ -73,8 +73,18 @@ class App
         foreach ($this->config['sites'] as $site) {
             $domain = $site['domain'];
             $this->excuteCommand("mkdir -p '/settings/ssl/$domain'");
+
             if ($site['auto_ssl']) {
-                $command = "openssl req -x509 -new -nodes -sha256 -utf8 -days 3650 -newkey rsa:2048 -keyout '/settings/ssl/$domain/ssl.key' -out '/settings/ssl/$domain/ssl.crt' -config /builds/settings/ssl/ssl.conf";
+                $sslCrtPath = "/settings/ssl/$domain/ssl.crt";
+                $sslKeyPath = "/settings/ssl/$domain/ssl.key";
+
+                if (file_exists($sslCrtPath) && file_exists($sslKeyPath)) {
+                    $expiredAt = openssl_x509_parse(file_get_contents($sslCrtPath))['validTo_time_t'];
+                    if ($expiredAt > time() + 60 * 60 * 24 * 30) {
+                        continue;
+                    }
+                }
+                $command = "openssl req -x509 -new -nodes -sha256 -utf8 -days 365 -newkey rsa:2048 -keyout '/settings/ssl/$domain/ssl.key' -out '/settings/ssl/$domain/ssl.crt' -config /builds/settings/ssl/ssl.conf";
                 $this->excuteCommand($command);
             }
         }
