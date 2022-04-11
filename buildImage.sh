@@ -2,6 +2,7 @@
 
 imageName=dnmp
 
+docker rmi ${imageName}
 docker system prune
 docker build -t ${imageName} . --no-cache
 
