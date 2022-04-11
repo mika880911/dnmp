@@ -3,7 +3,7 @@
 imageName=dnmp
 
 docker rmi ${imageName}
-docker system prune
+docker system prune -af
 docker build -t ${imageName} . --no-cache
 
 mkdir -p ./volumes/settings
