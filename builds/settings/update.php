@@ -114,7 +114,7 @@ class App
 
     public function configurationHosts()
     {
-        echo "configuration container's /etc/hosts";
+        echo "configuration container's /etc/hosts...\n\n";
 
         $hosts = file_get_contents('/etc/hosts');
 
