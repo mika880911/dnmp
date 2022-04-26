@@ -8,7 +8,6 @@ LNMP in Docker
     - default password：
 - nginx：latest stable
 - reids：latest stable
-- phpmyadmin： 5.1.3
 - php
     - 5.6
     - 7.0
@@ -26,7 +25,7 @@ LNMP in Docker
 ## Tutorial
 - first time usage you should make image following command
     ```bash
-    ./buildImage.sh
+    ./bulid.sh
     ```
 - congiguration ./volumes/settings/config.json
     ```json
@@ -65,9 +64,6 @@ LNMP in Docker
 
                 # add domain to your /etc/hosts ?
                 "auto_host": true,
-
-                # auto create or renew self-signed ssl ?
-                "auto_ssl": true
             }
         ],
         
@@ -88,19 +84,17 @@ LNMP in Docker
 
 ## How to use formal certificate
 Considering that the site may require use of a formal certificate, following step to setup
-
 - step1: start container
-- step2: configuration volumes/settings/config.json, let auto_ssl of your site be false
-- step3: put your sll.key and ssl.crt inside volumns/settings/ssl/{domain} folder
+- step2: put your sll.key and ssl.crt inside datas/ssl/{domain} folder
 - step4: restart container
 
 ## How to use nginx template
 Considering each projects may require different nginx settings, you can create a special template for a specific project to avoid the need to fine-tune the site settings every time when container restarted
 
-- step1: inside volumes/settings/templates/nginx create nginx config
-- step2: configuration volumes/settings/config.json, let your site template be template file name in volumes/settings/templates/nginx
+- step1: inside datas/templates/nginx create nginx config
+- step2: configuration config.json, let your site template be template file name in datas/templates/nginx
 - step3: restart container
 
 ## Configuration php.ini
-- step1: inside volumes/settings/templates/php folder have cli and fpm settings file, you can configuration it
+- step1: inside datas/templates/php folder have cli and fpm settings file, you can configuration it
 - step2: restart container
