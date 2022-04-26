@@ -86,7 +86,7 @@ LNMP in Docker
 Considering that the site may require use of a formal certificate, following step to setup
 - step1: start container
 - step2: put your sll.key and ssl.crt inside datas/ssl/{domain} folder
-- step4: restart container
+- step3: restart container
 
 ## How to use nginx template
 Considering each projects may require different nginx settings, you can create a special template for a specific project to avoid the need to fine-tune the site settings every time when container restarted
