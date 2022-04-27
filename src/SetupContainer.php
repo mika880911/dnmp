@@ -110,7 +110,7 @@ class SetupContainer
         $this->excuteCommand('service nginx restart');
 
         echo "start php-fpm...\n\n";
-        foreach (['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1'] as $phpVersion) {
+        foreach ($this->getUsedPhpFpmVersions() as $phpVersion) {
             $this->excuteCommand("service php$phpVersion-fpm restart");
         }
 
@@ -124,6 +124,19 @@ class SetupContainer
 
         echo "start redis...\n\n";
         $this->excuteCommand('service redis-server start');
+    }
+
+    private function getUsedPhpFpmVersions()
+    {
+        $result = [];
+        foreach ($this->config['sites'] as $site) {
+            $version = $site['php-fpm-version'];
+            if (! in_array($version, $result)) {
+                $result[] = $version;
+            }
+        }
+
+        return $result;
     }
 
     private function excuteCommand($command)
