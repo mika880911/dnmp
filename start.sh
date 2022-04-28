@@ -1,3 +1,4 @@
 #!/bin/bash
 
-$(php ./src/StartContainer.php)
+DIR=$(dirname $0)
+$(php ${DIR}/src/StartContainer.php)
