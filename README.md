@@ -30,6 +30,9 @@ LNMP in Docker
 - congiguration ./volumes/settings/config.json
     ```json
     {
+        # local hosts file path
+        "hosts-path": "/etc/hosts",
+
         # php-cli-version in container
         "php-cli-version": "7.4",
 
@@ -78,9 +81,14 @@ LNMP in Docker
     }
     ```
     - start and attach to the container
-        ```bash
-        sudo ./start.sh
-        ```
+        - windows
+            ```bash
+            ./start.bat
+            ```
+        - mac or linux
+            ```bash
+            sudo ./start.sh
+            ```
 
 ## How to use formal certificate
 Considering that the site may require use of a formal certificate, following step to setup

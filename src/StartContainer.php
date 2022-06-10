@@ -23,7 +23,7 @@ class StartContainer
             }
         }
 
-        file_put_contents('/etc/hosts', $hosts);
+        file_put_contents($this->config['hosts-path'], $hosts);
     }
 
     public function getStartContainerCommand()
@@ -42,14 +42,13 @@ class StartContainer
             $source = $this->transferPathToAbsolute($folder['source']);
             $dist = $folder['dist'];
 
-            $command .= " -v $source:$dist";
+            $command .= " -v \"$source\":\"$dist\"";
         }
 
         # mapping database
-        $command .= ' -v ' . $this->transferPathToAbsolute(__DIR__ . '/../datas/database') . ':/var/lib/mysql';
-
+        $command .= " -v \"{$this->transferPathToAbsolute(__DIR__ . '/../datas/database')}\":\"/var/lib/mysql\"";
         # mapping dnmp
-        $command .= ' -v ' . $this->transferPathToAbsolute(__DIR__ . '/../') . ':/dnmp';
+        $command .= " -v \"{$this->transferPathToAbsolute(__DIR__ . '/../')}\":\"/dnmp\"";
 
         # image name
         $command .= ' dnmp';
@@ -66,11 +65,17 @@ class StartContainer
             $fileName = null;
         }
 
-        $result = trim(shell_exec("cd $path && pwd"));
+        if (PHP_OS === 'WINNT') {
+            $result = trim(shell_exec("cd $path && cd"));
+        } else {
+            $result = trim(shell_exec("cd $path && pwd"));
+        }
 
         if ($fileName) {
             $result .= "/$fileName";
         }
+
+        $result = str_replace('\\', '/', $result);
 
         return $result;
     }
