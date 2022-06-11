@@ -34,12 +34,12 @@ EXIT /B 0
 
 
 :buildImage
-    docker rmi $1
+    docker rmi %~1
     docker system prune -af
-    docker build -t $1 ./src --no-cache
+    docker build -t %~1 ./src --no-cache
 EXIT /B 0
 
 :main
     call:resetDatas
-    call:buildImage
+    call:buildImage dnmp
 EXIT /B 0
