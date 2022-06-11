@@ -23,10 +23,15 @@ LNMP in Docker
 - install docker
 
 ## Tutorial
-- first time usage you should make image following command
-    ```bash
-    ./bulid.sh
-    ```
+- first time usage you should make image following command (all question should enter y)
+    - windows
+        ```bash
+        .\build.bat
+        ```
+    - mac or linux
+        ```bash
+        ./build.sh
+        ```
 - congiguration ./volumes/settings/config.json
     ```json
     {
@@ -83,7 +88,7 @@ LNMP in Docker
     - start and attach to the container
         - windows
             ```bash
-            ./start.bat
+            .\start.bat
             ```
         - mac or linux
             ```bash
