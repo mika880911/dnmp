@@ -27,7 +27,7 @@ class SetupContainer
         $phpCliVersion = $this->config['php-cli-version'];
         echo "setup php to $phpCliVersion...\n\n";
         $this->excuteCommand('rm /etc/alternatives/php');
-        $this->excuteCommand("ln /usr/bin/php$phpCliVersion /etc/alternatives/php");
+        $this->excuteCommand("ln -s /usr/bin/php$phpCliVersion /etc/alternatives/php");
 
         # setup php.ini
         foreach (['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1'] as $phpVersion) {
