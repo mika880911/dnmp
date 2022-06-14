@@ -42,13 +42,13 @@ class StartContainer
             $source = $this->transferPathToAbsolute($folder['source']);
             $dist = $folder['dist'];
 
-            $command .= " -v \"$source\":\"$dist\"";
+            $command .= " -v $source:$dist";
         }
 
         # mapping database
-        $command .= " -v \"{$this->transferPathToAbsolute(__DIR__ . '/../datas/database')}\":\"/var/lib/mysql\"";
+        $command .= " -v {$this->transferPathToAbsolute(__DIR__ . '/../datas/database')}:/var/lib/mysql";
         # mapping dnmp
-        $command .= " -v \"{$this->transferPathToAbsolute(__DIR__ . '/../')}\":\"/dnmp\"";
+        $command .= " -v {$this->transferPathToAbsolute(__DIR__ . '/../')}:/dnmp";
 
         # image name
         $command .= ' dnmp';
