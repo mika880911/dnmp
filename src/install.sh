@@ -32,7 +32,16 @@ function installPhp() {
     for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1
     do
         apt install -y php${version} php${version}-fpm
-        apt install -y php${version}-zip php${version}-xml php${version}-mysql php${version}-sqlite3 php${version}-curl php${version}-redis php${version}-gd php${version}-imagick php${version}-mbstring
+        apt install -y \
+        php${version}-zip \
+        php${version}-xml \
+        php${version}-mysql \
+        php${version}-sqlite3 \
+        php${version}-curl \
+        php${version}-redis \
+        php${version}-gd \
+        php${version}-imagick \
+        php${version}-mbstring \
 
         # start php-fpm first, if never started call restart will not working
         service php${version}-fpm start
