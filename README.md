@@ -112,3 +112,9 @@ Docker 版 LNMP
 若要配置 php.ini 請參照以下步驟
 1. 編輯 datas/templates/php 內的 php-cli 及 php-fpm
 2. 重啟容器
+
+## 貢獻指南
+[連結](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CONTRIBUTING.md)
+
+## 行為準則
+[連結](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CODE_OF_CONDUCT.md)
