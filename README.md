@@ -114,9 +114,10 @@ Docker 版 LNMP
 2. 重啟容器
 
 ## 配置 Xdebug
-1. 默認情況下 `xdebug` 會將資料推往 `9003` 端口，若想修改此端口，請修改 `datas/templates/xdebug.ini` 中的 `xdebug.client_port` 及 `xdebug.remote_port`
-2. dnmp 將會自動維護 `xdebug.client_host` 及 `xdebug.remote_host` 因此你不需要調整上述兩個值
-3. 在 `vscode` 使用:
+1. 默認情況下關閉 Xdebug 避免拖慢網站效能，若需要啟動，請將 `datas/templates/xdebug.ini` 內的註解取消
+2. 開啟後 `xdebug` 會將資料推往 `9003` 端口，若想修改此端口，請修改 `datas/templates/xdebug.ini` 中的 `xdebug.client_port` 及 `xdebug.remote_port`
+3. dnmp 將會自動維護 `xdebug.client_host` 及 `xdebug.remote_host` 因此你不需要調整上述兩個值
+4. 在 `vscode` 使用:
     - 將 `port` 修改成對應的值（`dnmp` 預設是 `9003` 端口)
     - 新增 `pathMappings` 其鍵值為 "`容器內專案位置`":`"${workspaceFolder}`"
     - 範例
@@ -131,7 +132,6 @@ Docker 版 LNMP
             }
         }
         ```
-
 
 ## 貢獻指南
 [連結](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CONTRIBUTING.md)
