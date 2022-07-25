@@ -42,6 +42,7 @@ function installPhp() {
         php${version}-gd \
         php${version}-imagick \
         php${version}-mbstring \
+        php${version}-xdebug \
 
         # start php-fpm first, if never started call restart will not working
         service php${version}-fpm start

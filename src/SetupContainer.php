@@ -29,13 +29,15 @@ class SetupContainer
         $this->excuteCommand('rm /etc/alternatives/php');
         $this->excuteCommand("ln -s /usr/bin/php$phpCliVersion /etc/alternatives/php");
 
+        $cliIni       = file_get_contents($this->baseDir . '/datas/templates/php/php-cli.ini');
+        $fpmIni       = file_get_contents($this->baseDir . '/datas/templates/php/php-fpm.ini');
+        $xdebugIni    = file_get_contents($this->baseDir . '/datas/templates/php/xdebug.ini');
+
         # setup php.ini
         foreach (['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1'] as $phpVersion) {
-            $cliIni = file_get_contents($this->baseDir . '/datas/templates/php/php-cli.ini');
-            $fpmIni = file_get_contents($this->baseDir . '/datas/templates/php/php-fpm.ini');
-
             file_put_contents("/etc/php/$phpVersion/cli/php.ini", $cliIni);
             file_put_contents("/etc/php/$phpVersion/fpm/php.ini", $fpmIni);
+            file_put_contents("/etc/php/$phpVersion/mods-available/xdebug.ini", $xdebugIni);
         }
     }
 
@@ -66,8 +68,8 @@ class SetupContainer
         echo "setup ssl...\n\n";
 
         foreach ($this->config['sites'] as $site) {
-            $domain = $site['domain'];
-            $dir = $this->baseDir . '/datas/ssl/' . $domain;
+            $domain   = $site['domain'];
+            $dir      = $this->baseDir . '/datas/ssl/' . $domain;
             $this->excuteCommand("mkdir -p '$dir'");
 
             $sslCrtPath = $dir . '/ssl.crt';

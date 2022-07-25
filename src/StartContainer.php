@@ -80,9 +80,22 @@ class StartContainer
         return $result;
     }
 
+    public function modifyXdebugIni()
+    {
+        $xdebugIniPath = __DIR__ . '/../datas/templates/php/xdebug.ini';
+        $xdebugIni = file_get_contents($xdebugIniPath);
+
+        $currentIp = gethostbyname(gethostname());
+        $xdebugIni = preg_replace('/xdebug.client_host=(.*)/', 'xdebug.client_host=' . $currentIp, $xdebugIni);
+        $xdebugIni = preg_replace('/xdebug.remote_host=(.*)/', 'xdebug.remote_host=' . $currentIp, $xdebugIni);
+
+        file_put_contents($xdebugIniPath, $xdebugIni);
+    }
+
     public function run()
     {
         $this->modifyHosts();
+        $this->modifyXdebugIni();
         $this->getStartContainerCommand();
     }
 }

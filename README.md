@@ -32,7 +32,7 @@ Docker 版 LNMP
         ```bash
         ./build.sh
         ```
-- 配置 ./config.json
+- 配置 `./config.json`
     ```json
     {
         # 本機 hosts 文件位置
@@ -48,10 +48,10 @@ Docker 版 LNMP
         "folders": [
             {
                 # 本機目錄
-                "source": "~/Desktop/project",
+                "source": "~/Desktop/projects",
 
                 # 容器內目錄 (該目錄必須不存在，或為空)
-                "dist": "/var/www/project"
+                "dist": "/var/www/projects"
             }
         ],
 
@@ -59,16 +59,16 @@ Docker 版 LNMP
         "sites": [
             {
                 # 站點網域
-                "domain": "phpmyadmin.test",
+                "domain": "laravel9.test",
 
                 # 站點入口文件 (index.php) 位置 
-                "entry-point": "/builds/phpmyadmin/5.1.3",
+                "entry-point": "/var/www/projects/laravel9.test/public",
                 
                 # ./datas/templates/nginx 下的檔案名稱
                 "template": "default.conf",
 
                 # 此站點要跑在哪個版本的 php 之下
-                "php-fpm-version": "7.4",
+                "php-fpm-version": "8.1",
 
                 # 是否要自動管理 hosts 文件
                 "auto_host": true,
@@ -98,20 +98,40 @@ Docker 版 LNMP
 ## 替換自簽 SSL 憑證
 考慮到你的站點有可能需要使用正式 ssl 憑證，你可以參照以下步驟進行設定
 1. 啟動容器
-2. 將你的 ssl 憑證命名為 ssl.crt 及 ssl.key 並替換掉 datas/ssl/{domain} 目錄下的 ssl.crt 及 ssl.key
+2. 將你的 ssl 憑證命名為 `ssl.crt` 及 `ssl.key` 並替換掉 `datas/ssl/{domain}` 目錄下的 `ssl.crt` 及 `ssl.key`
 3. 重啟容器
 
 ## 自定義 nginx 模板
-考慮到每個專案所需要的 nginx 站點設定不一定相同，因此請參照以下步驟，創建屬於自己的 nginx 模板
+考慮到每個專案所需要的 `nginx` 站點設定不一定相同，因此請參照以下步驟，創建屬於自己的 `nginx` 模板
 
-1. 在 datas/templates/ngnix 目錄下創建一個 {名稱}.conf 檔案
-2. 編輯 config.json 並將站點中 template 值設定成 {名稱}.conf 
+1. 在 `datas/templates/ngnix` 目錄下創建一個 `{名稱}.conf` 檔案
+2. 編輯 `config.json` 並將站點中 `template` 值設定成 `{名稱}.conf` 
 3. 重啟容器
 
 ## 配置 php.ini
-若要配置 php.ini 請參照以下步驟
-1. 編輯 datas/templates/php 內的 php-cli 及 php-fpm
+若要配置 `php.ini` 請參照以下步驟
+1. 編輯 `datas/templates/php` 內的 `php-cli.ini` 及 `php-fpm.ini`
 2. 重啟容器
+
+## 配置 Xdebug
+1. 默認情況下 `xdebug` 會將資料推往 `9003` 端口，若想修改此端口，請修改 `datas/templates/xdebug.ini` 中的 `xdebug.client_port` 及 `xdebug.remote_port`
+2. dnmp 將會自動維護 `xdebug.client_host` 及 `xdebug.remote_host` 因此你不需要調整上述兩個值
+3. 在 `vscode` 使用:
+    - 將 `port` 修改成對應的值（`dnmp` 預設是 `9003` 端口)
+    - 新增 `pathMappings` 其鍵值為 "`容器內專案位置`":`"${workspaceFolder}`"
+    - 範例
+        ```json
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/var/www/projects/laravel9.test": "${workspaceFolder}"
+            }
+        }
+        ```
+
 
 ## 貢獻指南
 [連結](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CONTRIBUTING.md)
