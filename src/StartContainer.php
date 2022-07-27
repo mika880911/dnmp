@@ -53,7 +53,7 @@ class StartContainer
         # image name
         $command .= ' dnmp';
 
-        echo $command;
+        return $command;
     }
 
     private function transferPathToAbsolute($path)
@@ -96,7 +96,7 @@ class StartContainer
     {
         $this->modifyHosts();
         $this->modifyXdebugIni();
-        $this->getStartContainerCommand();
+        echo $this->getStartContainerCommand();
     }
 }
 
