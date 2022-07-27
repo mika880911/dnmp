@@ -5,6 +5,7 @@ function installUtils() {
     DEBIAN_FRONTEND="noninteractive" apt install -y vim zip unzip wget git software-properties-common
     add-apt-repository -y ppa:ondrej/php
     apt update
+    update-ca-certificates
 }
 
 function installNginx() {

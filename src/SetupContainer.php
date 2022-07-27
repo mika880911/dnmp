@@ -66,6 +66,9 @@ class SetupContainer
     public function setupSSL()
     {
         echo "setup ssl...\n\n";
+        $caCrtPath = $this->baseDir . '/src/ca.crt';
+        $caKeyPath = $this->baseDir . '/src/ca.key';
+        $caSrlPath = $this->baseDir . '/src/ca.srl';
 
         foreach ($this->config['sites'] as $site) {
             $domain   = $site['domain'];
@@ -74,17 +77,36 @@ class SetupContainer
 
             $sslCrtPath = $dir . '/ssl.crt';
             $sslKeyPath = $dir . '/ssl.key';
+            $sslCsrPath = $dir . '/ssl.csr';
 
             if (file_exists($sslCrtPath) && file_exists($sslKeyPath)) {
                 $expiredAt = openssl_x509_parse(file_get_contents($sslCrtPath))['validTo_time_t'];
+
+                # 如果憑證 30 天後過期，就更新
                 if ($expiredAt > time() + 60 * 60 * 24 * 30) {
                     continue;
                 }
             }
 
-            $command = "openssl req -x509 -new -nodes -sha256 -utf8 -days 365 -newkey rsa:2048 -keyout '${sslKeyPath}' -out '${sslCrtPath}' -config " . $this->baseDir . '/src/ssl.conf';
+            # generate ssl.key
+            $command = "openssl genrsa -out {$sslKeyPath} 4096";
+            $this->excuteCommand($command);
+
+            # generate ssl.csr
+            $command = "openssl req -key {$sslKeyPath} -out {$sslCsrPath} -subj \"/CN={$domain}\" -new -sha256";
+            $this->excuteCommand($command);
+
+            # generate ssl.crt
+            $command = "bash -c 'openssl x509 -req -sha256 -days 365 -in {$sslCsrPath} -out {$sslCrtPath} -CA {$caCrtPath} -CAkey {$caKeyPath} -extfile <(printf \"subjectAltName=DNS:{$domain},IP:127.0.0.1\\nextendedKeyUsage = serverAuth\") -CAcreateserial'";
+            $this->excuteCommand($command);
+
+            #
+            $command = "rm {$sslCsrPath}";
             $this->excuteCommand($command);
         }
+
+        $command = "rm {$caSrlPath}";
+        $this->excuteCommand($command);
     }
 
     public function setupHosts()
