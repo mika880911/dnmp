@@ -9,6 +9,23 @@ class StartContainer
         $this->config = json_decode(file_get_contents(__DIR__ . '/../config.json'), true);
     }
 
+    public function addTrustedCa()
+    {
+        $caPath = __DIR__ . '/ca.crt';
+        $command = null;
+
+        if (PHP_OS === "Darwin") {
+            if (stristr(shell_exec("security verify-cert -c  {$caPath} 2>/dev/null") ?? "", "successful") === false) {
+                $command = "sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain {$caPath}";
+            }
+        } elseif (PHP_OS === 'WINNT') {
+        }
+
+        if ($command) {
+            shell_exec($command);
+        }
+    }
+
     public function modifyHosts()
     {
         $hosts = file_get_contents($this->config['hosts-path']);
@@ -94,6 +111,7 @@ class StartContainer
 
     public function run()
     {
+        $this->addTrustedCa();
         $this->modifyHosts();
         $this->modifyXdebugIni();
         echo $this->getStartContainerCommand();
