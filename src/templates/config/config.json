@@ -4,14 +4,14 @@
     "composer-version": "2",
     "folders": [
         {
-            "source": "~/Desktop/project",
-            "dist": "/var/www/project"
+            "source": "~/Desktop/projects",
+            "dist": "/var/www/projects"
         }
     ],
     "sites": [
         {
             "domain": "phpmyadmin.test",
-            "entry-point": "/var/www/project/phpmyadmin",
+            "entry-point": "/var/www/projects/phpmyadmin",
             "template": "default.conf",
             "php-fpm-version": "7.4",
             "auto_host": true
