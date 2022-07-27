@@ -58,6 +58,10 @@ function installComposer() {
 
 function installRedis() {
     apt install -y redis-server
+
+    # enable remote connect
+    sed -i -e "69,/bind 127.0.0.1 ::1/{s/bind 127.0.0.1 ::1/# bind 127.0.0.1 ::1/}" /etc/redis/redis.conf
+    sed -i -e "1,/protected-mode yes/{s/protected-mode yes/protected-mode no/}" /etc/redis/redis.conf
 }
 
 function cleanup() {
