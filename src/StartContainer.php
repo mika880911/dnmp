@@ -19,6 +19,7 @@ class StartContainer
                 $command = "sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain {$caPath}";
             }
         } elseif (PHP_OS === 'WINNT') {
+            $command = "certutil -addstore root {$caPath}";
         }
 
         if ($command) {
