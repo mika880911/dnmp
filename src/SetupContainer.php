@@ -89,23 +89,23 @@ class SetupContainer
             }
 
             # generate ssl.key
-            $command = "openssl genrsa -out {$sslKeyPath} 4096";
+            $command = "openssl genrsa -out \"{$sslKeyPath}\" 4096";
             $this->excuteCommand($command);
 
             # generate ssl.csr
-            $command = "openssl req -key {$sslKeyPath} -out {$sslCsrPath} -subj \"/CN={$domain}\" -new -sha256";
+            $command = "openssl req -key \"{$sslKeyPath}\" -out \"{$sslCsrPath}\" -subj \"/CN={$domain}\" -new -sha256";
             $this->excuteCommand($command);
 
             # generate ssl.crt
-            $command = "bash -c 'openssl x509 -req -sha256 -days 365 -in {$sslCsrPath} -out {$sslCrtPath} -CA {$caCrtPath} -CAkey {$caKeyPath} -extfile <(printf \"subjectAltName=DNS:{$domain},IP:127.0.0.1\\nextendedKeyUsage = serverAuth\") -CAcreateserial'";
+            $command = "bash -c 'openssl x509 -req -sha256 -days 365 -in \"{$sslCsrPath}\" -out \"{$sslCrtPath}\" -CA \"{$caCrtPath}\" -CAkey \"{$caKeyPath}\" -extfile <(printf \"subjectAltName=DNS:{$domain},IP:127.0.0.1\\nextendedKeyUsage = serverAuth\") -CAcreateserial'";
             $this->excuteCommand($command);
 
             #
-            $command = "rm {$sslCsrPath}";
+            $command = "rm \"{$sslCsrPath}\"";
             $this->excuteCommand($command);
         }
 
-        $command = "rm {$caSrlPath}";
+        $command = "rm \"{$caSrlPath}\"";
         $this->excuteCommand($command);
     }
 
