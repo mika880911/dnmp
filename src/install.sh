@@ -25,6 +25,19 @@ function installMysql() {
     # fixed warning
     usermod -d /var/lib/mysql/ mysql 
 
+    # fixed debian user not correct
+    echo 
+'[client]
+host     = localhost
+user     = root
+password =
+socket   = /var/run/mysqld/mysqld.sock
+[mysql_upgrade]
+host     = localhost
+user     = root
+password =
+socket   = /var/run/mysqld/mysqld.sock' > /etc/mysql/debian.cnf
+
     # delete all database
     rm -rf /var/lib/mysql
 }
