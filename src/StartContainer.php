@@ -65,8 +65,12 @@ class StartContainer
 
         # mapping database
         $command .= " -v {$this->transferPathToAbsolute(__DIR__ . '/../datas/database')}:/var/lib/mysql";
+
         # mapping dnmp
         $command .= " -v {$this->transferPathToAbsolute(__DIR__ . '/../')}:/dnmp";
+
+        # setting container name
+        $command .= " --name dnmp";
 
         # image name
         $command .= ' dnmp';
