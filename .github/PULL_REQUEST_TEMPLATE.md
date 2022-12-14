@@ -1,3 +1,3 @@
-## 關聯問題
+## Relation Issue
 fixed: #(issue-number)  
 fixed: #(issue-number)

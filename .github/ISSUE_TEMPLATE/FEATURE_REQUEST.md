@@ -1,11 +1,11 @@
 ---
-name: Feature Request
-about: 提出任何你認為好用的功能！
-title: '[Feature] 請簡略描述你所想要的功能'
+name: 'Feature Request'
+about: 'Request any feature！'
+title: '[Feature]'
 labels: 'Feature'
 assignees: ''
 ---
 
-### 動機
+### Reason
 
-### 功能說明
+### How can we help you?

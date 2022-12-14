@@ -1,18 +1,15 @@
 ---
-name: Bug Report
-about: 回報你所發現的 Bug，讓我們改善它！
-title: '[Bug] 請簡略描述此 Bug'
+name: 'Bug Report'
+about: 'Report bug let this project better'
+title: '[Bug]'
 labels: 'Bug'
 assignees: ''
 ---
 
-### 運行環境
-- 作業系統: MacOS #.#.#
-- CPU 型號:
-- DNMP 版本: #.#.#
-- PHP-CLI 版本: #.#.#
-- Docker 版本: #.#.#, build #######
+### Environment
+- os version: MacOS #.#.#
+- php version: #.#.#
 
-### 問題描述
+### Bug Description
 
-### 重現步驟
+### Steps
