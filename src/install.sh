@@ -20,13 +20,13 @@ function installMysql() {
     apt install -y mysql-server
 
     # enable remote connect
-    sed -i -e "1,/bind-address/{s/bind-address/#bind-address/}" /etc/mysql/mysql.conf.d/mysqld.cnf 
+    sed -i -e "1,/bind-address/{s/bind-address/#bind-address/}" /etc/mysql/mysql.conf.d/mysqld.cnf
 
     # fixed warning
-    usermod -d /var/lib/mysql/ mysql 
+    usermod -d /var/lib/mysql/ mysql
 
     # fixed debian user not correct
-    echo 
+    echo
 '[client]
 host     = localhost
 user     = root
@@ -43,7 +43,7 @@ socket   = /var/run/mysqld/mysqld.sock' > /etc/mysql/debian.cnf
 }
 
 function installPhp() {
-    for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1
+    for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1 8.2
     do
         apt install -y php${version} php${version}-fpm
         apt install -y \

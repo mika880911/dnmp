@@ -1,13 +1,13 @@
 # DNMP
-Docker 版 LNMP
+LNMP of Docker Version
 
-## DNMP 集成列表
+## Feature
 - ubuntu：20.04
-- mysql：最新穩定版
-    - 預設帳號：root
-    - 預設密碼：無
-- nginx：最新穩定版
-- reids：最新穩定版
+- mysql：lates
+    - account：root
+    - password：
+- nginx：latest
+- reids：latest
 - php
     - 5.6
     - 7.0
@@ -17,124 +17,156 @@ Docker 版 LNMP
     - 7.4
     - 8.0
     - 8.1
+    - 8.2
 
-## 環境要求
-- 任意版本的 php-cli
-- 任意版本的 docker
+## Environment Required
+- [Docker](https://www.docker.com/)
 
-## 教學
-- 第一次使用請透過下列指令構建鏡像 (所有問題請輸入 y)
-    - Windows 作業系統
-        ```bash
-        .\build.bat
-        ```
-    - Mac 或 Linux 作業系統
-        ```bash
-        ./build.sh
-        ```
-- 配置 `./config.json`
+## Tutorial
+1. clone project
+    ```sh
+    git clone https://github.com/ntut-mika/dnmp.git
+    ```
+2. start container
+    ```sh
+    # Windows(PowerShell)
+    .\start.ps1
+
+    # Mac、Linux
+    ./start.sh
+    ```
+3. explain `config.json`
+    - `ip`: do not change or delete it, the system will automatically maintain
+
+    - `config-version`: modify your value same as example, you needs to check your config.json format is same as example while modifying this value
+    
+    - `php-cli-version`: php cli version inside the container
+    
+    - `composer-version`: composer version inside the container
+    
+    - `folders.*.local`: which local folder needs to be mapped into the container
+
+    - `folders.*.container`: where should the local folder be mapped to the container
+
+    - `sites.*.enabled`: whether to enable the website
+    
+    - `sites.*.domain`: site domain
+
+    - `sites.*.entry-point`: which folder of the container is the project entry point
+
+    - `sites.*.template`: which configuration to use in ./datas/templates/nginx folder
+    
+    - `sites.*.php-fpm-version`: which PHP version should this site use
+    
+    - `sites.*.auto_host`: whether to add host mapping
+
+    - `ports.*.local`: which port should be forwarded to the container
+
+    - `ports.*.container`: target of local port forwarding
+
+    - `xdebug.enabled`: whether to enable xdebug
+
+    - `xdebug.port`: which local port should receive xdebug data
+
+    - `xdebug.idekey` some ide need to use this value to listen xdebug, you can modify this value
+
+    example
     ```json
     {
-        # 本機 hosts 文件位置
-        "hosts-path": "/etc/hosts",
-
-        # 容器內 php-cli 版本
-        "php-cli-version": "7.4",
-
-        # 容器內 composer 版本
+        "ip": "",
+        "config-version": "1.6.0",
+        "php-cli-version": "8.2",
         "composer-version": "2", 
-
-        # 目錄映射
         "folders": [
             {
-                # 本機目錄
-                "source": "~/Desktop/projects",
-
-                # 容器內目錄 (該目錄必須不存在，或為空)
-                "dist": "/var/www/projects"
+                "local": "~/Desktop/projects",
+                "container": "/var/www/projects"
             }
         ],
-
-        # nginx 站點配置
         "sites": [
             {
-                # 站點網域
-                "domain": "laravel9.test",
-
-                # 站點入口文件 (index.php) 位置 
-                "entry-point": "/var/www/projects/laravel9.test/public",
-                
-                # ./datas/templates/nginx 下的檔案名稱
+                "enabled": true,
+                "domain": "laravel.test",
+                "entry-point": "/var/www/projects/demo1/public",
                 "template": "default.conf",
-
-                # 此站點要跑在哪個版本的 php 之下
-                "php-fpm-version": "8.1",
-
-                # 是否要自動管理 hosts 文件
-                "auto_host": true,
+                "php-fpm-version": "8.2",
+                "auto_host": true
+            },
+            {
+                "enabled": true,
+                "domain": "wordpress.test",
+                "entry-point": "/var/www/projects/demo2",
+                "template": "default.conf",
+                "php-fpm-version": "8.2",
+                "auto_host": true
             }
         ],
-        
-        # 端口映射
-        "ports": {
-            # 本機端口:容器端口
-            "80": "80",
-            "443": "443",
-            "3306": "3306",
-            "6379": "6379"
+        "ports": [
+            {
+                "local": "80",
+                "container": "80"
+            },
+            {
+                "local": "443",
+                "container": "443"
+            },
+            {
+                "local": "3306",
+                "container": "3306"
+            },
+            {
+                "local": "6379",
+                "container": "6379"
+            }
+        ],
+        "xdebug": {
+            "enabled": true,
+            "idekey": "phpstorm",
+            "port": 9003
         }
     }
     ```
-    - 透過下列指令啟動並進入容器
-        - Windows 作業系統
-            ```bash
-            .\start.bat
-            ```
-        - Mac 或 Linux 作業系統
-            ```bash
-            sudo ./start.sh
-            ```
+4. Change SSL
 
-## 替換自簽 SSL 憑證
-考慮到你的站點有可能需要使用正式 ssl 憑證，你可以參照以下步驟進行設定
-1. 啟動容器
-2. 將你的 ssl 憑證命名為 `ssl.crt` 及 `ssl.key` 並替換掉 `datas/ssl/{domain}` 目錄下的 `ssl.crt` 及 `ssl.key`
-3. 重啟容器
+    By default system automatically generate self-signed certificate, if you want to use other certificate, you can put your `ssl.crt` and `ssl.key` into the `datas/ssl/{domain} folder
 
-## 自定義 nginx 模板
-考慮到每個專案所需要的 `nginx` 站點設定不一定相同，因此請參照以下步驟，創建屬於自己的 `nginx` 模板
+5. Customize nginx template
+    
+    Considering that the site settings required by each project are not necessarily the same, if `./datas/templates/nginx/default.conf` does not meet your needs, you can create `./datas/templates/nginx/{name}.conf`, and change the value of `sites.*.template` in `./config.json` to `{name}.conf`
 
-1. 在 `datas/templates/ngnix` 目錄下創建一個 `{名稱}.conf` 檔案
-2. 編輯 `config.json` 並將站點中 `template` 值設定成 `{名稱}.conf` 
-3. 重啟容器
+6. Configuration php.ini
 
-## 配置 php.ini
-若要配置 `php.ini` 請參照以下步驟
-1. 編輯 `datas/templates/php` 內的 `php-cli.ini` 及 `php-fpm.ini`
-2. 重啟容器
-
-## 配置 Xdebug
-1. 默認情況下關閉 Xdebug 避免拖慢網站效能，若需要啟動，請將 `datas/templates/xdebug.ini` 內的註解取消
-2. 開啟後 `xdebug` 會將資料推往 `9003` 端口，若想修改此端口，請修改 `datas/templates/xdebug.ini` 中的 `xdebug.client_port` 及 `xdebug.remote_port`
-3. dnmp 將會自動維護 `xdebug.client_host` 及 `xdebug.remote_host` 因此你不需要調整上述兩個值
-4. 在 `vscode` 使用:
-    - 將 `port` 修改成對應的值（`dnmp` 預設是 `9003` 端口)
-    - 新增 `pathMappings` 其鍵值為 "`容器內專案位置`":`"${workspaceFolder}`"
-    - 範例
+    if you need to change php.ini setting you can change `datas/templates/php/php-cli.ini` and `datas/template/php/php-fpm.ini`
+7. Use Xdebug
+    - vscode example (.vscode/launch.json)
         ```json
         {
-            "name": "Listen for Xdebug",
-            "type": "php",
-            "request": "launch",
-            "port": 9003,
-            "pathMappings": {
-                "/var/www/projects/laravel9.test": "${workspaceFolder}"
-            }
+            "version": "0.2.0",
+            "configurations": [
+                {
+                    "name": "Listen for Xdebug",
+                    "type": "php",
+                    "request": "launch",
+                    "port": 9003,
+                    "pathMappings": {
+                        "/var/www/projects/demo1": "${workspaceFolder}"
+                    }
+                },
+            ]
         }
         ```
+8. stop container
+    ```sh
+    exit
+    ```
 
-## 貢獻指南
-[連結](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CONTRIBUTING.md)
+## Note
+- You don't need to change any file inside src folder
+- When you change anything, you need to restart the container to apply the settings
 
-## 行為準則
-[連結](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CODE_OF_CONDUCT.md)
+
+## CONTRIBUTING
+[link](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CONTRIBUTING.md)
+
+## CODE OF CONDUCT
+[link](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CODE_OF_CONDUCT.md)

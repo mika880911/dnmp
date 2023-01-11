@@ -1,26 +1,45 @@
 {
-    "hosts-path": "/etc/hosts",
-    "php-cli-version": "7.4",
-    "composer-version": "2",
+    "ip": "",
+    "config_version": "1.6.0",
+    "php_cli_version": "8.2",
+    "composer_version": "2", 
     "folders": [
         {
-            "source": "~/Desktop/projects",
-            "dist": "/var/www/projects"
+            "local": "~/Desktop/projects",
+            "container": "/var/www/projects"
         }
     ],
     "sites": [
         {
-            "domain": "phpmyadmin.test",
-            "entry-point": "/var/www/projects/phpmyadmin",
+            "enabled": true,
+            "domain": "laravel.test",
+            "entry_point": "/var/www/projects/laravel/public",
             "template": "default.conf",
-            "php-fpm-version": "7.4",
+            "php_fpm_version": "8.2",
             "auto_host": true
         }
     ],
-    "ports": {
-        "80": "80",
-        "443": "443",
-        "3306": "3306",
-        "6379": "6379"
+    "ports": [
+        {
+            "local": "80",
+            "container": "80"
+        },
+        {
+            "local": "443",
+            "container": "443"
+        },
+        {
+            "local": "3306",
+            "container": "3306"
+        },
+        {
+            "local": "6379",
+            "container": "6379"
+        }
+    ],
+    "xdebug": {
+        "enabled": false,
+        "idekey": "phpstorm",
+        "port": 9003
     }
 }

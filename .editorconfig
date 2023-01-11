@@ -9,3 +9,7 @@ indent_style = space
 [*.php]
 indent_size = 4
 trim_trailing_whitespace = true
+
+[*.sh]
+indent_size = 4
+trim_trailing_whitespace = true
