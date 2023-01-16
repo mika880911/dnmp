@@ -29,22 +29,22 @@ LNMP of Docker Version
     ```
 2. start container
     ```sh
-    # Windows(PowerShell)
-    .\start.ps1
+    # Windows
+    .\start.bat
 
     # Mac、Linux
     ./start.sh
     ```
 3. explain `config.json`
-    - `ip`: do not change or delete it, the system will automatically maintain
+    - `ip`: do not change or delete it, the system will maintain automatically
 
-    - `config-version`: modify your value same as example, you needs to check your config.json format is same as example while modifying this value
+    - `config_version`: modify your value same as example, you need to check your config.json format is same as example while modifying this value
     
-    - `php-cli-version`: php cli version inside the container
+    - `php_cli_version`: php cli version inside the container
     
-    - `composer-version`: composer version inside the container
+    - `composer_version`: composer version inside the container
     
-    - `folders.*.local`: which local folder needs to be mapped into the container
+    - `folders.*.local`: which local folder needs to be mapped to the container
 
     - `folders.*.container`: where should the local folder be mapped to the container
 
@@ -52,11 +52,11 @@ LNMP of Docker Version
     
     - `sites.*.domain`: site domain
 
-    - `sites.*.entry-point`: which folder of the container is the project entry point
+    - `sites.*.entry_point`: which folder of the container is the project entry point
 
-    - `sites.*.template`: which configuration to use in ./datas/templates/nginx folder
+    - `sites.*.nginx_template`: which configuration to use in ./datas/templates/nginx folder
     
-    - `sites.*.php-fpm-version`: which PHP version should this site use
+    - `sites.*.php_fpm_version`: which PHP version should this site use
     
     - `sites.*.auto_host`: whether to add host mapping
 
@@ -74,9 +74,9 @@ LNMP of Docker Version
     ```json
     {
         "ip": "",
-        "config-version": "1.6.0",
-        "php-cli-version": "8.2",
-        "composer-version": "2", 
+        "config_version": "1.6.0",
+        "php_cli_version": "8.2",
+        "composer_version": "2", 
         "folders": [
             {
                 "local": "~/Desktop/projects",
@@ -87,16 +87,16 @@ LNMP of Docker Version
             {
                 "enabled": true,
                 "domain": "laravel.test",
-                "entry-point": "/var/www/projects/demo1/public",
-                "template": "default.conf",
-                "php-fpm-version": "8.2",
+                "entry_point": "/var/www/projects/demo1/public",
+                "nginx_template": "default.conf",
+                "php_fpm_version": "8.2",
                 "auto_host": true
             },
             {
                 "enabled": true,
                 "domain": "wordpress.test",
                 "entry-point": "/var/www/projects/demo2",
-                "template": "default.conf",
+                "nginx_template": "default.conf",
                 "php-fpm-version": "8.2",
                 "auto_host": true
             }
@@ -128,7 +128,7 @@ LNMP of Docker Version
     ```
 4. Change SSL
 
-    By default system automatically generate self-signed certificate, if you want to use other certificate, you can put your `ssl.crt` and `ssl.key` into the `datas/ssl/{domain} folder
+    By default, the system will generate self-signed certificate automatically. If you want to use other certificate, you can put your `ssl.crt` and `ssl.key` into the `datas/ssl/{domain} folder
 
 5. Customize nginx template
     
@@ -136,7 +136,7 @@ LNMP of Docker Version
 
 6. Configuration php.ini
 
-    if you need to change php.ini setting you can change `datas/templates/php/php-cli.ini` and `datas/template/php/php-fpm.ini`
+    If you need to change php.ini setting you can change `datas/templates/php/php-cli.ini` and `datas/template/php/php-fpm.ini`
 7. Use Xdebug
     - vscode example (.vscode/launch.json)
         ```json

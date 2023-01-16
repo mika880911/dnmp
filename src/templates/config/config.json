@@ -14,7 +14,7 @@
             "enabled": true,
             "domain": "laravel.test",
             "entry_point": "/var/www/projects/laravel/public",
-            "template": "default.conf",
+            "nginx_template": "default.conf",
             "php_fpm_version": "8.2",
             "auto_host": true
         }

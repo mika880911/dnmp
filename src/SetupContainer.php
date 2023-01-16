@@ -33,8 +33,15 @@ class SetupContainer
     {
         # setup php-cli version
         $phpCliVersion = $this->config['php_cli_version'];
-        $this->excuteCommand('rm /etc/alternatives/php');
-        $this->excuteCommand("ln -s /usr/bin/php$phpCliVersion /etc/alternatives/php");
+        $availableVersion = ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2'];
+
+        if (in_array($phpCliVersion, $availableVersion)) {
+            $this->executeCommand('rm /etc/alternatives/php');
+            $this->executeCommand("ln -s /usr/bin/php$phpCliVersion /etc/alternatives/php");
+            echo "{$this->SUCCESSFUL_COLOR}php($phpCliVersion)\t(successful)\n{$this->DEFAULT_COLOR}";
+        } else {
+            echo "{$this->ERROR_COLOR}php($phpCliVersion)\t(failed: version not allow)\n{$this->DEFAULT_COLOR}";
+        }
 
         $cliIni       = file_get_contents($this->baseDir . '/datas/templates/php/php-cli.ini');
         $fpmIni       = file_get_contents($this->baseDir . '/datas/templates/php/php-fpm.ini');
@@ -58,26 +65,34 @@ class SetupContainer
         }
 
         # setup php.ini
-        foreach (['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2'] as $phpVersion) {
+        foreach ($availableVersion as $phpVersion) {
             file_put_contents("/etc/php/$phpVersion/cli/php.ini", $cliIni);
             file_put_contents("/etc/php/$phpVersion/fpm/php.ini", $fpmIni);
             file_put_contents("/etc/php/$phpVersion/mods-available/xdebug.ini", $xdebugIni);
         }
 
         foreach ($this->getUsedPhpFpmVersions() as $phpVersion) {
-            $this->excuteCommand("service php$phpVersion-fpm restart");
+            if (in_array($phpVersion, $availableVersion)) {
+                $this->executeCommand("service php$phpVersion-fpm restart");
+            } else {
+                echo "{$this->ERROR_COLOR}php-fpm($phpVersion)\t(failed: version not allow)\n{$this->DEFAULT_COLOR}";
+            }
         }
-
-        echo "{$this->SUCCESSFUL_COLOR}php($phpCliVersion)\t(successful)\n{$this->DEFAULT_COLOR}";
     }
 
     public function setupComposer()
     {
-        $composerVersion = $this->config['composer_version'];
-        $this->excuteCommand("composer self-update --$composerVersion");
+        $availableVersion   = [1, 2];
+        $composerVersion    = $this->config['composer_version'];
 
-        echo "{$this->SUCCESSFUL_COLOR}composer($composerVersion)\t(successful)\n{$this->DEFAULT_COLOR}";
-        $this->excuteCommand('echo export PATH=\"\$HOME/.config/composer/vendor/bin:\$PATH\" >> ~/.bashrc', false);
+        if (in_array($composerVersion, $availableVersion)) {
+            $this->executeCommand("composer self-update --$composerVersion");
+            echo "{$this->SUCCESSFUL_COLOR}composer($composerVersion)\t(successful)\n{$this->DEFAULT_COLOR}";
+        } else {
+            echo "{$this->ERROR_COLOR}composer($composerVersion)\t(failed: version not allow)\n{$this->DEFAULT_COLOR}";
+        }
+
+        $this->executeCommand('echo export PATH=\"\$HOME/.config/composer/vendor/bin:\$PATH\" >> ~/.bashrc', false);
     }
 
     public function setupSSL()
@@ -91,7 +106,7 @@ class SetupContainer
         foreach ($this->config['sites'] as $site) {
             $domain   = $site['domain'];
             $dir      = $this->baseDir . '/datas/ssl/' . $domain;
-            $this->excuteCommand("mkdir -p '$dir'");
+            $this->executeCommand("mkdir -p '$dir'");
 
             $sslCrtPath = $dir . '/ssl.crt';
             $sslKeyPath = $dir . '/ssl.key';
@@ -108,23 +123,23 @@ class SetupContainer
 
             # generate ssl.key
             $command = "openssl genrsa -out \"{$sslKeyPath}\" 4096";
-            $this->excuteCommand($command);
+            $this->executeCommand($command);
 
             # generate ssl.csr
             $command = "openssl req -key \"{$sslKeyPath}\" -out \"{$sslCsrPath}\" -subj \"/CN={$domain}\" -new -sha256";
-            $this->excuteCommand($command);
+            $this->executeCommand($command);
 
             # generate ssl.crt
             $command = "bash -c 'openssl x509 -req -sha256 -days 365 -in \"{$sslCsrPath}\" -out \"{$sslCrtPath}\" -CA \"{$caCrtPath}\" -CAkey \"{$caKeyPath}\" -extfile <(printf \"subjectAltName=DNS:{$domain},IP:127.0.0.1\\nextendedKeyUsage = serverAuth\") -CAcreateserial'";
-            $this->excuteCommand($command);
+            $this->executeCommand($command);
 
             # remove ssl.csr
             $command = "rm \"{$sslCsrPath}\"";
-            $this->excuteCommand($command);
+            $this->executeCommand($command);
         }
 
         $command = "rm \"{$caSrlPath}\"";
-        $this->excuteCommand($command);
+        $this->executeCommand($command);
 
         echo "{$this->SUCCESSFUL_COLOR}ssl\t\t(successful)\n{$this->DEFAULT_COLOR}";
     }
@@ -145,7 +160,11 @@ class SetupContainer
 
         file_put_contents('/etc/hosts', $hosts);
 
-        echo "{$this->SUCCESSFUL_COLOR}hosts\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        if (file_get_contents('/etc/hosts') == $hosts) {
+            echo "{$this->SUCCESSFUL_COLOR}hosts\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        } else {
+            echo "{$this->ERROR_COLOR}hosts\t\t(failed: can't write /etc/hsots)\n{$this->DEFAULT_COLOR}";
+        }
     }
 
     public function setupNginx()
@@ -153,36 +172,48 @@ class SetupContainer
         foreach ($this->config['sites'] as $site) {
             if ($site['enabled']) {
                 $fileName = $site['domain'];
-                $template = file_get_contents($this->baseDir . '/datas/templates/nginx/' . $site['template']);
+                $nginxTemplate = file_get_contents($this->baseDir . '/datas/templates/nginx/' . $site['nginx_template']);
                 foreach ($site as $key => $value) {
-                    $template = str_replace("<$key>", $site[$key], $template);
+                    $nginxTemplate = str_replace("<$key>", $site[$key], $nginxTemplate);
                 }
 
-                file_put_contents("/etc/nginx/sites-enabled/$fileName", $template);
+                file_put_contents("/etc/nginx/sites-enabled/$fileName", $nginxTemplate);
             }
         }
 
-        $this->excuteCommand('service nginx restart');
+        $this->executeCommand('service nginx restart');
 
-        echo "{$this->SUCCESSFUL_COLOR}nginx\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        if ($this->executeCommand('nginx -t', true, true) == 0) {
+            echo "{$this->SUCCESSFUL_COLOR}nginx\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        } else {
+            echo "{$this->ERROR_COLOR}nginx\t\t(failed: datas/templates/nginx/* configuration incorrect)\n{$this->DEFAULT_COLOR}";
+        }
     }
 
     public function setupMysql()
     {
         if (count(scandir('/var/lib/mysql')) == 2) {
-            $this->excuteCommand('bash ' . $this->baseDir . '/src/initializeMysql.sh');
+            $this->executeCommand('bash ' . $this->baseDir . '/src/initializeMysql.sh');
         } else {
-            $this->excuteCommand('service mysql restart');
+            $this->executeCommand('service mysql restart');
         }
 
-        echo "{$this->SUCCESSFUL_COLOR}mysql\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        if ($this->executeCommand('mysqladmin -h 127.0.0.1 -uroot processlist', true, true) == 0) {
+            echo "{$this->SUCCESSFUL_COLOR}mysql\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        } else {
+            echo "{$this->ERROR_COLOR}mysql\t\t(failed: can't start mysql server, delete the data/database directory may fix this problem)\n{$this->DEFAULT_COLOR}";
+        }
     }
 
     public function setupRedis()
     {
-        $this->excuteCommand('service redis-server start');
+        $this->executeCommand('service redis-server start');
 
-        echo "{$this->SUCCESSFUL_COLOR}redis\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        if ($this->executeCommand('redis-cli -h 127.0.0.1 -p 6379 ping', true, true) == 0) {
+            echo "{$this->SUCCESSFUL_COLOR}redis\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        } else {
+            echo "{$this->ERROR_COLOR}redis\t\t(failed can't start redis server)\n{$this->DEFAULT_COLOR}";
+        }
     }
 
     private function getUsedPhpFpmVersions()
@@ -198,10 +229,14 @@ class SetupContainer
         return $result;
     }
 
-    private function excuteCommand($command, $redirectStdOutput = true)
+    private function executeCommand($command, $redirectStdOutput = true, $getExitCode = false)
     {
         if ($redirectStdOutput) {
             $command .= " > /dev/null 2>&1";
+        }
+
+        if ($getExitCode) {
+            $command .= '; echo $?';
         }
 
         return shell_exec($command);
