@@ -163,10 +163,3 @@ LNMP of Docker Version
 ## Note
 - You don't need to change any file inside src folder
 - When you change anything, you need to restart the container to apply the settings
-
-
-## CONTRIBUTING
-[link](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CONTRIBUTING.md)
-
-## CODE OF CONDUCT
-[link](https://github.com/ntut-mika/dnmp/blob/1.x/.github/CODE_OF_CONDUCT.md)
