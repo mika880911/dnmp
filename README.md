@@ -95,9 +95,9 @@ LNMP of Docker Version
             {
                 "enabled": true,
                 "domain": "wordpress.test",
-                "entry-point": "/var/www/projects/demo2",
+                "entry_point": "/var/www/projects/demo2",
                 "nginx_template": "default.conf",
-                "php-fpm-version": "8.2",
+                "php_fpm_version": "8.2",
                 "auto_host": true
             }
         ],
