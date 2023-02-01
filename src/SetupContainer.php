@@ -102,6 +102,7 @@ class SetupContainer
         $caSrlPath = $this->baseDir . '/src/DnmpCa.srl';
 
         copy($caCrtPath, '/usr/local/share/ca-certificates/DnmpCa.crt');
+        $this->executeCommand('update-ca-certificates');
 
         foreach ($this->config['sites'] as $site) {
             $domain   = $site['domain'];
