@@ -3,11 +3,11 @@ LNMP of Docker Version
 
 ## Feature
 - ubuntu：20.04
-- mysql：lates
+- mysql：latest
     - account：root
     - password：
 - nginx：latest
-- reids：latest
+- redis：latest
 - php
     - 5.6
     - 7.0
