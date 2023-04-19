@@ -1,10 +1,11 @@
 {
     "ip": "",
-    "config_version": "1.6.0",
+    "config_version": "1.7.0",
     "php_cli_version": "8.2",
     "composer_version": "2", 
     "folders": [
         {
+            "enabled": true,
             "local": "~/Desktop/projects",
             "container": "/var/www/projects"
         }
@@ -21,18 +22,22 @@
     ],
     "ports": [
         {
+            "enabled": true,
             "local": "80",
             "container": "80"
         },
         {
+            "enabled": true,
             "local": "443",
             "container": "443"
         },
         {
+            "enabled": true,
             "local": "3306",
             "container": "3306"
         },
         {
+            "enabled": true,
             "local": "6379",
             "container": "6379"
         }

@@ -27,6 +27,7 @@ LNMP of Docker Version
     ```sh
     git clone https://github.com/ntut-mika/dnmp.git
     ```
+
 2. start container
     ```sh
     # Windows
@@ -35,6 +36,7 @@ LNMP of Docker Version
     # Mac、Linux
     ./start.sh
     ```
+
 3. explain `config.json`
     - `ip`: do not change or delete it, the system will maintain automatically
 
@@ -44,6 +46,8 @@ LNMP of Docker Version
     
     - `composer_version`: composer version inside the container
     
+    - `folders.*.enabled`: whether to use current folders mapping
+
     - `folders.*.local`: which local folder needs to be mapped to the container
 
     - `folders.*.container`: where should the local folder be mapped to the container
@@ -60,6 +64,8 @@ LNMP of Docker Version
     
     - `sites.*.auto_host`: whether to add host mapping
 
+    - `ports.*.enabled`: whether to use current port mapping
+
     - `ports.*.local`: which port should be forwarded to the container
 
     - `ports.*.container`: target of local port forwarding
@@ -74,11 +80,12 @@ LNMP of Docker Version
     ```json
     {
         "ip": "",
-        "config_version": "1.6.0",
+        "config_version": "1.7.0",
         "php_cli_version": "8.2",
         "composer_version": "2", 
         "folders": [
             {
+                "enabled": true,
                 "local": "~/Desktop/projects",
                 "container": "/var/www/projects"
             }
@@ -103,18 +110,22 @@ LNMP of Docker Version
         ],
         "ports": [
             {
+                "enabled": true,
                 "local": "80",
                 "container": "80"
             },
             {
+                "enabled": true,
                 "local": "443",
                 "container": "443"
             },
             {
+                "enabled": true,
                 "local": "3306",
                 "container": "3306"
             },
             {
+                "enabled": true,
                 "local": "6379",
                 "container": "6379"
             }
@@ -126,6 +137,7 @@ LNMP of Docker Version
         }
     }
     ```
+
 4. Change SSL
 
     By default, the system will generate self-signed certificate automatically. If you want to use other certificate, you can put your `ssl.crt` and `ssl.key` into the `datas/ssl/{domain} folder
@@ -137,6 +149,7 @@ LNMP of Docker Version
 6. Configuration php.ini
 
     If you need to change php.ini setting you can change `datas/templates/php/php-cli.ini` and `datas/template/php/php-fpm.ini`
+
 7. Use Xdebug
     - vscode example (.vscode/launch.json)
         ```json
@@ -155,6 +168,7 @@ LNMP of Docker Version
             ]
         }
         ```
+
 8. stop container
     ```sh
     exit

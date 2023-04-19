@@ -3,7 +3,7 @@
 ############### Global Variable Start ##############
 SCRIPT_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P);
 CONFIG_PATH="${SCRIPT_PATH}/config.json";
-CONFIG_VERSION="1.6.0";
+CONFIG_VERSION="1.7.0";
 IMAGE_VERSION="1.6.0";
 ############### Global Variable End ##############
 
@@ -292,11 +292,11 @@ function startContainer() {
     local command="${sudo} docker run --rm -it";
 
     # mapping ports
-    getJsonValue ${CONFIG_PATH} 'ports[] | "-p " + (.local) + ":" + (.container)';
+    getJsonValue ${CONFIG_PATH} 'ports[] | select(.enabled == true) | "-p " + (.local) + ":" + (.container)';
     command="${command} ${result}";
 
     # mapping folders
-    getJsonValue ${CONFIG_PATH} 'folders[] | "-v " + (.local) + ":" + (.container)';
+    getJsonValue ${CONFIG_PATH} 'folders[] | select(.enabled == true) | "-v " + (.local) + ":" + (.container)';
     command="${command} ${result}";
 
     # mapping database
@@ -347,4 +347,3 @@ function main()
 }
 
 main
-

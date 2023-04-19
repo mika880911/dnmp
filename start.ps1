@@ -255,11 +255,11 @@ function startContainer()
     $command = "docker run --rm -it"
 
     # mapping ports
-    $ports = getJsonValue $CONFIG_PATH 'ports[] | \"-p \" + (.local) + \":\" + (.container)'
+    $ports = getJsonValue $CONFIG_PATH 'ports[] | select(.enabled == true) | \"-p \" + (.local) + \":\" + (.container)'
     $command = "$command $ports"
 
     # mapping folders
-    $folders = getJsonValue $CONFIG_PATH 'folders[] | \"-v \" + (.local) + \":\" + (.container)'
+    $folders = getJsonValue $CONFIG_PATH 'folders[] | select(.enabled == true) | \"-v \" + (.local) + \":\" + (.container)'
     $command = "$command $folders"
 
     # mapping database
