@@ -1,8 +1,8 @@
 ############### Global Variable Start ##############
 $SCRIPT_PATH=$PSScriptRoot
 $CONFIG_PATH="$SCRIPT_PATH/config.json"
-$CONFIG_VERSION="1.6.0"
-$IMAGE_VERSION="1.6.0"
+$CONFIG_VERSION="1.7.0"
+$IMAGE_VERSION="1.7.0"
 ############### Global Variable End ##############
 
 

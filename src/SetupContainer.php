@@ -27,6 +27,7 @@ class SetupContainer
         $this->setupNginx();
         $this->setupMysql();
         $this->setupRedis();
+        $this->setupCronJob();
     }
 
     public function setupPhp()
@@ -175,7 +176,9 @@ class SetupContainer
                 $fileName = $site['domain'];
                 $nginxTemplate = file_get_contents($this->baseDir . '/datas/templates/nginx/' . $site['nginx_template']);
                 foreach ($site as $key => $value) {
-                    $nginxTemplate = str_replace("<$key>", $site[$key], $nginxTemplate);
+                    if (is_string($value)) {
+                        $nginxTemplate = str_replace("<$key>", $value, $nginxTemplate);
+                    }
                 }
 
                 file_put_contents("/etc/nginx/sites-enabled/$fileName", $nginxTemplate);
@@ -215,6 +218,28 @@ class SetupContainer
         } else {
             echo "{$this->ERROR_COLOR}redis\t\t(failed can't start redis server)\n{$this->DEFAULT_COLOR}";
         }
+    }
+
+    public function setupCronJob()
+    {
+        foreach ($this->config['sites'] as $site) {
+            if ($site['enabled']) {
+                foreach ($site['cronjobs'] as $cronJob) {
+                    if ($cronJob['enabled']) {
+                        $job = $cronJob['job'];
+                        foreach ($site as $key => $value) {
+                            if (is_string($value)) {
+                                $job = str_replace("<$key>", $value, $job);
+                            }
+                        }
+                        $this->executeCommand("crontab -l 2>/dev/null | { cat; echo \"{$job}\"; } | crontab -");
+                    }
+                }
+            }
+        }
+
+        $this->executeCommand('service cron start');
+        echo "{$this->SUCCESSFUL_COLOR}cronjob\t\t(successful)\n{$this->DEFAULT_COLOR}";
     }
 
     private function getUsedPhpFpmVersions()

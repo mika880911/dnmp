@@ -78,6 +78,10 @@ function installRedis() {
     sed -i -e "1,/protected-mode yes/{s/protected-mode yes/protected-mode no/}" /etc/redis/redis.conf
 }
 
+function installCron() {
+    apt install -y cron
+}
+
 function cleanup() {
     rm -rf /dnmp
 }
@@ -89,6 +93,7 @@ function install() {
     installPhp
     installComposer
     installRedis
+    installCron
 }
 
 function main() {

@@ -17,7 +17,13 @@
             "entry_point": "/var/www/projects/laravel/public",
             "nginx_template": "default.conf",
             "php_fpm_version": "8.2",
-            "auto_host": true
+            "auto_host": true,
+            "cronjobs": [
+                {
+                    "enabled": true,
+                    "job": "* * * * * cd <entry_point>/../ && php<php_fpm_version> artisan schedule:run > /dev/null 2>&1"
+                }
+            ]
         }
     ],
     "ports": [
