@@ -23,6 +23,13 @@
                     "enabled": true,
                     "job": "* * * * * cd <entry_point>/../ && php<php_fpm_version> artisan schedule:run > /dev/null 2>&1"
                 }
+            ],
+            "supervisors": [
+                {
+                    "enabled": true,
+                    "directory": "<entry_point>/../",
+                    "command": "php<php_fpm_version> artisan queue:work"
+                }
             ]
         }
     ],

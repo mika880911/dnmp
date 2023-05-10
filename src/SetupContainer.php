@@ -28,6 +28,7 @@ class SetupContainer
         $this->setupMysql();
         $this->setupRedis();
         $this->setupCronJob();
+        $this->setupSupervisor();
     }
 
     public function setupPhp()
@@ -240,6 +241,36 @@ class SetupContainer
 
         $this->executeCommand('service cron start');
         echo "{$this->SUCCESSFUL_COLOR}cronjob\t\t(successful)\n{$this->DEFAULT_COLOR}";
+    }
+
+    public function setupSupervisor()
+    {
+        foreach ($this->config['sites'] as $site) {
+            if ($site['enabled']) {
+                foreach ($site['supervisors'] as $supervisor) {
+                    if ($supervisor['enabled']) {
+                        $programName =  bin2hex(random_bytes(16));
+                        $settingFileContent = "[program:{$programName}]" . PHP_EOL;
+                        foreach ($supervisor as $key => $value) {
+                            if ($key != 'enabled') {
+                                foreach ($site as $siteKey => $siteValue) {
+                                    if (is_string($siteValue)) {
+                                        $value = str_replace("<$siteKey>", $siteValue, $value);
+                                    }
+                                }
+
+                                $settingFileContent .= "{$key}={$value}" . PHP_EOL;
+                            }
+                        }
+
+                        file_put_contents("/etc/supervisor/conf.d/{$programName}.conf", $settingFileContent);
+                    }
+                }
+            }
+        }
+
+        $this->executeCommand('service supervisor start');
+        echo "{$this->SUCCESSFUL_COLOR}supervisor\t(successful)\n{$this->DEFAULT_COLOR}";
     }
 
     private function getUsedPhpFpmVersions()

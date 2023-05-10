@@ -82,6 +82,10 @@ function installCron() {
     apt install -y cron
 }
 
+function installSupervisor() {
+    apt install -y supervisor
+}
+
 function cleanup() {
     rm -rf /dnmp
 }
@@ -94,6 +98,8 @@ function install() {
     installComposer
     installRedis
     installCron
+    installSupervisor
+    cleanup
 }
 
 function main() {
