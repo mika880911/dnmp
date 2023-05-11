@@ -1,8 +1,9 @@
 <?php
 
+namespace Mika\Dnmp;
+
 class SetupContainer
 {
-    # color
     protected $ERROR_COLOR        = "\033[0;31m";
     protected $SUCCESSFUL_COLOR   = "\033[0;32m";
     protected $DEFAULT_COLOR      = "\033[0m";
@@ -14,12 +15,13 @@ class SetupContainer
 
     public function __construct()
     {
-        $this->config = json_decode(file_get_contents($this->baseDir . '/config.json'), true);
+        $this->config = json_decode(file_get_contents("{$this->baseDir}/config.json"), true);
+        $this->config['sites'] = $this->getReplacedSites($this->config['sites']);
     }
 
     public function pipeLine()
     {
-        echo "{$this->INFO_COLOR}======= Setup Container Env =======\n{$this->DEFAULT_COLOR}";
+        $this->echo("======= Setup Container Env =======\n", $this->INFO_COLOR);
         $this->setupPhp();
         $this->setupComposer();
         $this->setupSSL();
@@ -33,31 +35,23 @@ class SetupContainer
 
     public function setupPhp()
     {
-        # setup php-cli version
+        // setup php-cli version
         $phpCliVersion = $this->config['php_cli_version'];
         $availableVersion = ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2'];
 
-        if (in_array($phpCliVersion, $availableVersion)) {
-            $this->executeCommand('rm /etc/alternatives/php');
-            $this->executeCommand("ln -s /usr/bin/php$phpCliVersion /etc/alternatives/php");
-            echo "{$this->SUCCESSFUL_COLOR}php($phpCliVersion)\t(successful)\n{$this->DEFAULT_COLOR}";
-        } else {
-            echo "{$this->ERROR_COLOR}php($phpCliVersion)\t(failed: version not allow)\n{$this->DEFAULT_COLOR}";
-        }
-
-        $cliIni       = file_get_contents($this->baseDir . '/datas/templates/php/php-cli.ini');
-        $fpmIni       = file_get_contents($this->baseDir . '/datas/templates/php/php-fpm.ini');
+        $cliIni       = file_get_contents("{$this->baseDir}/datas/templates/php/php-cli.ini");
+        $fpmIni       = file_get_contents("{$this->baseDir}/datas/templates/php/php-fpm.ini");
         $xdebugIni    = '';
 
         if ($this->config['xdebug']['enabled']) {
             $xdebugIni  = "zend_extension=xdebug.so\n";
-            # xdebug 2
+            // xdebug 2
             $xdebugIni .= "xdebug.remote_enable=1\n";
             $xdebugIni .= "xdebug.remote_autostart=1\n";
             $xdebugIni .= "xdebug.remote_port={$this->config['xdebug']['port']}\n";
             $xdebugIni .= "xdebug.remote_host={$this->config['ip']}\n";
 
-            # xdebug 3
+            // xdebug 3
             $xdebugIni .= "xdebug.mode=develop,coverage,debug,profile\n";
             $xdebugIni .= "xdebug.start_with_request=yes\n";
             $xdebugIni .= "xdebug.client_port={$this->config['xdebug']['port']}\n";
@@ -66,85 +60,82 @@ class SetupContainer
             $xdebugIni .= "xdebug.idekey={$this->config['xdebug']['idekey']}";
         }
 
-        # setup php.ini
+        // setup php.ini and start service
         foreach ($availableVersion as $phpVersion) {
-            file_put_contents("/etc/php/$phpVersion/cli/php.ini", $cliIni);
-            file_put_contents("/etc/php/$phpVersion/fpm/php.ini", $fpmIni);
-            file_put_contents("/etc/php/$phpVersion/mods-available/xdebug.ini", $xdebugIni);
+            file_put_contents("/etc/php/{$phpVersion}/cli/php.ini", $cliIni);
+            file_put_contents("/etc/php/{$phpVersion}/fpm/php.ini", $fpmIni);
+            file_put_contents("/etc/php/{$phpVersion}/mods-available/xdebug.ini", $xdebugIni);
+            $this->executeCommand("service php{$phpVersion}-fpm start");
         }
 
-        foreach ($this->getUsedPhpFpmVersions() as $phpVersion) {
-            if (in_array($phpVersion, $availableVersion)) {
-                $this->executeCommand("service php$phpVersion-fpm restart");
-            } else {
-                echo "{$this->ERROR_COLOR}php-fpm($phpVersion)\t(failed: version not allow)\n{$this->DEFAULT_COLOR}";
-            }
+        // setup php soft link
+        if (in_array($phpCliVersion, $availableVersion)) {
+            $this->executeCommand('rm /etc/alternatives/php');
+            $this->executeCommand("ln -s /usr/bin/php{$phpCliVersion} /etc/alternatives/php");
+            $this->echo("php({$phpCliVersion})\t(successful)\n", $this->SUCCESSFUL_COLOR);
+        } else {
+            $this->echo("php({$phpCliVersion})\t(failed: version not allow)\n", $this->ERROR_COLOR);
         }
     }
 
     public function setupComposer()
     {
-        $availableVersion   = [1, 2];
         $composerVersion    = $this->config['composer_version'];
-
-        if (in_array($composerVersion, $availableVersion)) {
-            $this->executeCommand("composer self-update --$composerVersion");
-            echo "{$this->SUCCESSFUL_COLOR}composer($composerVersion)\t(successful)\n{$this->DEFAULT_COLOR}";
-        } else {
-            echo "{$this->ERROR_COLOR}composer($composerVersion)\t(failed: version not allow)\n{$this->DEFAULT_COLOR}";
-        }
+        $availableVersion   = [1, 2];
 
         $this->executeCommand('echo export PATH=\"\$HOME/.config/composer/vendor/bin:\$PATH\" >> ~/.bashrc', false);
+
+        if (in_array($composerVersion, $availableVersion)) {
+            $this->executeCommand("composer self-update --{$composerVersion}");
+            $this->echo("composer({$composerVersion})\t(successful)\n", $this->SUCCESSFUL_COLOR);
+        } else {
+            $this->echo("composer({$composerVersion})\t(failed: version not allow)\n", $this->ERROR_COLOR);
+        }
     }
 
     public function setupSSL()
     {
-        $caCrtPath = $this->baseDir . '/src/DnmpCa.crt';
-        $caKeyPath = $this->baseDir . '/src/DnmpCa.key';
-        $caSrlPath = $this->baseDir . '/src/DnmpCa.srl';
+        $caCrtPath = "{$this->baseDir}/src/DnmpCa.crt";
+        $caKeyPath = "{$this->baseDir}/src/DnmpCa.key";
+        $caSrlPath = "{$this->baseDir}/src/DnmpCa.srl";
 
         copy($caCrtPath, '/usr/local/share/ca-certificates/DnmpCa.crt');
         $this->executeCommand('update-ca-certificates');
 
         foreach ($this->config['sites'] as $site) {
             $domain   = $site['domain'];
-            $dir      = $this->baseDir . '/datas/ssl/' . $domain;
-            $this->executeCommand("mkdir -p '$dir'");
+            $sslDir = "{$this->baseDir}/datas/ssl/{$domain}";
+            $this->executeCommand("mkdir -p '$sslDir'");
 
-            $sslCrtPath = $dir . '/ssl.crt';
-            $sslKeyPath = $dir . '/ssl.key';
-            $sslCsrPath = $dir . '/ssl.csr';
+            $sslCrtPath = "{$sslDir}/ssl.crt";
+            $sslKeyPath = "{$sslDir}/ssl.key";
+            $sslCsrPath = "{$sslDir}/ssl.csr";
 
             if (file_exists($sslCrtPath) && file_exists($sslKeyPath)) {
                 $expiredAt = openssl_x509_parse(file_get_contents($sslCrtPath))['validTo_time_t'];
 
-                # renew the certificate if it expires after 30 days
+                // renew the certificate if it expires after 30 days
                 if ($expiredAt > time() + 60 * 60 * 24 * 30) {
                     continue;
                 }
             }
 
-            # generate ssl.key
-            $command = "openssl genrsa -out \"{$sslKeyPath}\" 4096";
-            $this->executeCommand($command);
+            // generate ssl.key
+            $this->executeCommand("openssl genrsa -out \"{$sslKeyPath}\" 4096");
 
-            # generate ssl.csr
-            $command = "openssl req -key \"{$sslKeyPath}\" -out \"{$sslCsrPath}\" -subj \"/CN={$domain}\" -new -sha256";
-            $this->executeCommand($command);
+            // generate ssl.csr
+            $this->executeCommand("openssl req -key \"{$sslKeyPath}\" -out \"{$sslCsrPath}\" -subj \"/CN={$domain}\" -new -sha256");
 
-            # generate ssl.crt
-            $command = "bash -c 'openssl x509 -req -sha256 -days 365 -in \"{$sslCsrPath}\" -out \"{$sslCrtPath}\" -CA \"{$caCrtPath}\" -CAkey \"{$caKeyPath}\" -extfile <(printf \"subjectAltName=DNS:{$domain},IP:127.0.0.1\\nextendedKeyUsage = serverAuth\") -CAcreateserial'";
-            $this->executeCommand($command);
+            // generate ssl.crt
+            $this->executeCommand("bash -c 'openssl x509 -req -sha256 -days 365 -in \"{$sslCsrPath}\" -out \"{$sslCrtPath}\" -CA \"{$caCrtPath}\" -CAkey \"{$caKeyPath}\" -extfile <(printf \"subjectAltName=DNS:{$domain},IP:127.0.0.1\\nextendedKeyUsage = serverAuth\") -CAcreateserial'");
 
-            # remove ssl.csr
-            $command = "rm \"{$sslCsrPath}\"";
-            $this->executeCommand($command);
+            // remove ssl.csr
+            $this->executeCommand("rm \"{$sslCsrPath}\"");
         }
 
-        $command = "rm \"{$caSrlPath}\"";
-        $this->executeCommand($command);
-
-        echo "{$this->SUCCESSFUL_COLOR}ssl\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        // remove DnmpCa.srl
+        $this->executeCommand("rm \"{$caSrlPath}\"");
+        $this->echo("ssl\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
     }
 
     public function setupHosts()
@@ -153,10 +144,8 @@ class SetupContainer
 
         foreach ($this->config['sites'] as $site) {
             if ($site['auto_host']) {
-                $domain = $site['domain'];
-
-                if (count(preg_grep("/^(127.0.0.1)([\s\\t]*)($domain)$/", explode("\n", $hosts))) == 0) {
-                    $hosts .= "\n127.0.0.1 $domain";
+                if (count(preg_grep("/^(127.0.0.1)([\s\\t]*)({$site['domain']})$/", explode("\n", $hosts))) == 0) {
+                    $hosts .= "\n127.0.0.1 {$site['domain']}";
                 }
             }
         }
@@ -164,9 +153,9 @@ class SetupContainer
         file_put_contents('/etc/hosts', $hosts);
 
         if (file_get_contents('/etc/hosts') == $hosts) {
-            echo "{$this->SUCCESSFUL_COLOR}hosts\t\t(successful)\n{$this->DEFAULT_COLOR}";
+            $this->echo("hosts\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
         } else {
-            echo "{$this->ERROR_COLOR}hosts\t\t(failed: can't write /etc/hsots)\n{$this->DEFAULT_COLOR}";
+            $this->echo("hosts\t\t(failed: can't write /etc/hsots)\n", $this->ERROR_COLOR);
         }
     }
 
@@ -174,39 +163,31 @@ class SetupContainer
     {
         foreach ($this->config['sites'] as $site) {
             if ($site['enabled']) {
-                $fileName = $site['domain'];
-                $nginxTemplate = file_get_contents($this->baseDir . '/datas/templates/nginx/' . $site['nginx_template']);
-                foreach ($site as $key => $value) {
-                    if (is_string($value)) {
-                        $nginxTemplate = str_replace("<$key>", $value, $nginxTemplate);
-                    }
-                }
-
-                file_put_contents("/etc/nginx/sites-enabled/$fileName", $nginxTemplate);
+                file_put_contents("/etc/nginx/sites-enabled/{$site['domain']}", $site['nginx_template_content']);
             }
         }
 
         $this->executeCommand('service nginx restart');
 
         if ($this->executeCommand('nginx -t', true, true) == 0) {
-            echo "{$this->SUCCESSFUL_COLOR}nginx\t\t(successful)\n{$this->DEFAULT_COLOR}";
+            $this->echo("nginx\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
         } else {
-            echo "{$this->ERROR_COLOR}nginx\t\t(failed: datas/templates/nginx/* configuration incorrect)\n{$this->DEFAULT_COLOR}";
+            $this->echo("nginx\t\t(failed: datas/templates/nginx/* configuration incorrect)\n", $this->ERROR_COLOR);
         }
     }
 
     public function setupMysql()
     {
         if (count(scandir('/var/lib/mysql')) == 2) {
-            $this->executeCommand('bash ' . $this->baseDir . '/src/initializeMysql.sh');
+            $this->executeCommand("bash {$this->baseDir}/src/initializeMysql.sh");
         } else {
             $this->executeCommand('service mysql restart');
         }
 
         if ($this->executeCommand('mysqladmin -h 127.0.0.1 -uroot processlist', true, true) == 0) {
-            echo "{$this->SUCCESSFUL_COLOR}mysql\t\t(successful)\n{$this->DEFAULT_COLOR}";
+            $this->echo("mysql\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
         } else {
-            echo "{$this->ERROR_COLOR}mysql\t\t(failed: can't start mysql server, delete the data/database directory may fix this problem)\n{$this->DEFAULT_COLOR}";
+            $this->echo("mysql\t\t(failed: can't start mysql server, delete the data/database directory may fix this problem)\n", $this->ERROR_COLOR);
         }
     }
 
@@ -215,9 +196,9 @@ class SetupContainer
         $this->executeCommand('service redis-server start');
 
         if ($this->executeCommand('redis-cli -h 127.0.0.1 -p 6379 ping', true, true) == 0) {
-            echo "{$this->SUCCESSFUL_COLOR}redis\t\t(successful)\n{$this->DEFAULT_COLOR}";
+            $this->echo("redis\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
         } else {
-            echo "{$this->ERROR_COLOR}redis\t\t(failed can't start redis server)\n{$this->DEFAULT_COLOR}";
+            $this->echo("redis\t\t(failed can't start redis server)\n", $this->ERROR_COLOR);
         }
     }
 
@@ -227,20 +208,14 @@ class SetupContainer
             if ($site['enabled']) {
                 foreach ($site['cronjobs'] as $cronJob) {
                     if ($cronJob['enabled']) {
-                        $job = $cronJob['job'];
-                        foreach ($site as $key => $value) {
-                            if (is_string($value)) {
-                                $job = str_replace("<$key>", $value, $job);
-                            }
-                        }
-                        $this->executeCommand("crontab -l 2>/dev/null | { cat; echo \"{$job}\"; } | crontab -");
+                        $this->executeCommand("crontab -l 2>/dev/null | { cat; echo \"{$cronJob['job']}\"; } | crontab -");
                     }
                 }
             }
         }
 
         $this->executeCommand('service cron start');
-        echo "{$this->SUCCESSFUL_COLOR}cronjob\t\t(successful)\n{$this->DEFAULT_COLOR}";
+        $this->echo("cronjob\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
     }
 
     public function setupSupervisor()
@@ -249,41 +224,22 @@ class SetupContainer
             if ($site['enabled']) {
                 foreach ($site['supervisors'] as $supervisor) {
                     if ($supervisor['enabled']) {
-                        $programName =  bin2hex(random_bytes(16));
-                        $settingFileContent = "[program:{$programName}]" . PHP_EOL;
+                        $programName = $site['domain'] . '-' . bin2hex(random_bytes(5));
+                        $supervisorContent = "[program:{$programName}]\n";
                         foreach ($supervisor as $key => $value) {
                             if ($key != 'enabled') {
-                                foreach ($site as $siteKey => $siteValue) {
-                                    if (is_string($siteValue)) {
-                                        $value = str_replace("<$siteKey>", $siteValue, $value);
-                                    }
-                                }
-
-                                $settingFileContent .= "{$key}={$value}" . PHP_EOL;
+                                $supervisorContent .= "{$key}={$value}\n";
                             }
                         }
 
-                        file_put_contents("/etc/supervisor/conf.d/{$programName}.conf", $settingFileContent);
+                        file_put_contents("/etc/supervisor/conf.d/{$programName}.conf", $supervisorContent);
                     }
                 }
             }
         }
 
-        $this->executeCommand('service supervisor start');
-        echo "{$this->SUCCESSFUL_COLOR}supervisor\t(successful)\n{$this->DEFAULT_COLOR}";
-    }
-
-    private function getUsedPhpFpmVersions()
-    {
-        $result = [];
-        foreach ($this->config['sites'] as $site) {
-            $version = $site['php_fpm_version'];
-            if (! in_array($version, $result)) {
-                $result[] = $version;
-            }
-        }
-
-        return $result;
+        $this->executeCommand('service supervisor start', true, true);
+        $this->echo("supervisor\t(successful)\n", $this->SUCCESSFUL_COLOR);
     }
 
     private function executeCommand($command, $redirectStdOutput = true, $getExitCode = false)
@@ -298,6 +254,55 @@ class SetupContainer
 
         return shell_exec($command);
     }
+
+    private function getReplacedSites($sites)
+    {
+        foreach ($sites as &$site) {
+            $replaceRules = [];
+            foreach ($site as $key => $value) {
+                if (! is_iterable($value)) {
+                    $replaceRules["<$key>"] = $value;
+                }
+            }
+
+            foreach ($site as $key => $value) {
+                if (! is_iterable($value)) {
+                    $replaceRules["<$key>"] = str_replace(array_keys($replaceRules), array_values($replaceRules), $value);
+                }
+            }
+
+            $replaceFrom = array_keys($replaceRules);
+            $replaceTo = array_values($replaceRules);
+
+            foreach ($site as $key => $value) {
+                if (! is_iterable($value)) {
+                    $site[$key] = str_replace($replaceFrom, $replaceTo, $value);
+                }
+            }
+
+            // load nginx template
+            $site['nginx_template_content'] = str_replace($replaceFrom, $replaceTo, file_get_contents("{$this->baseDir}/datas/templates/nginx/{$site['nginx_template']}"));
+
+            // replace array object
+            $processKeys = ['cronjobs', 'supervisors'];
+            foreach ($processKeys as $processKey) {
+                foreach ($site[$processKey] as $index => $target) {
+                    foreach ($target as $key => $value) {
+                        if (! is_iterable($value)) {
+                            $site[$processKey][$index][$key] = str_replace($replaceFrom, $replaceTo, $value);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $sites;
+    }
+
+    private function echo($string, $color)
+    {
+        echo "{$color}{$string}{$this->DEFAULT_COLOR}";
+    }
 }
 
-(new SetupContainer())->pipeLine();
+(new \Mika\Dnmp\SetupContainer())->pipeLine();

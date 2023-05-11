@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function main() {
-    php /dnmp/src/SetupContainer.php
+    php8.2 /dnmp/src/SetupContainer.php
     bash
 }
 

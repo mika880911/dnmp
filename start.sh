@@ -69,7 +69,8 @@ function getJsonValue()
     return 0;
 }
 
-function setJsonValue() {
+function setJsonValue()
+{
     local path=${1};
     local search=${2};
     local value=${3};
