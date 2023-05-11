@@ -26,17 +26,11 @@ function installMysql() {
     usermod -d /var/lib/mysql/ mysql
 
     # fixed debian user not correct
-    echo
-'[client]
-host     = localhost
-user     = root
-password =
-socket   = /var/run/mysqld/mysqld.sock
-[mysql_upgrade]
-host     = localhost
-user     = root
-password =
-socket   = /var/run/mysqld/mysqld.sock' > /etc/mysql/debian.cnf
+    cat /dev/null > debian.cnf
+
+    # fixed php5 can't connect
+    echo '[mysqld]
+    default_authentication_plugin=mysql_native_password' > /etc/mysql/conf.d/costomize.cnf
 
     # delete all database
     rm -rf /var/lib/mysql
