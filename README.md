@@ -132,16 +132,18 @@ LNMP of Docker Version
     }
     ```
 
+4. exit container
+    ```sh
+    exit
+    ```
 ## Advance
 ### Change SSL
 By default, the system will generate self-signed certificate automatically. If you want to use other certificate, you can put your `ssl.crt` and `ssl.key` into the `datas/ssl/{domain}` folder
 
 ### Customize nginx template
-    
 Considering that the site settings required by each project are not necessarily the same, if `./datas/templates/nginx/default.conf` does not meet your needs, you can create `./datas/templates/nginx/{name}.conf`, and change the value of `sites.*.template` in `./config.json` to `{name}.conf`
 
 ### Configuration php.ini
-
 If you need to change php.ini setting you can change `datas/templates/php/php-cli.ini` and `datas/template/php/php-fpm.ini`
 
 ### Use Xdebug
@@ -161,11 +163,6 @@ If you need to change php.ini setting you can change `datas/templates/php/php-cl
             },
         ]
     }
-    ```
-
-8. stop container
-    ```sh
-    exit
     ```
 
 ## Note
