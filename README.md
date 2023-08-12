@@ -18,6 +18,7 @@ LNMP of Docker Version
     - 8.0
     - 8.1
     - 8.2
+- ssh
 
 ## Environment Required
 - [Docker](https://www.docker.com/)

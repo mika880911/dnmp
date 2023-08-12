@@ -80,6 +80,20 @@ function installSupervisor() {
     apt install -y supervisor
 }
 
+function installSsh() {
+    apt install -y openssh-server
+
+    # enable empty root connect
+    sed -i -e "1,/#PermitEmptyPasswords no/{s/#PermitEmptyPasswords no/PermitEmptyPasswords yes/}" /etc/ssh/sshd_config
+    sed -i -e "1,/#PermitRootLogin prohibit-password/{s/#PermitRootLogin prohibit-password/PermitRootLogin yes/}" /etc/ssh/sshd_config
+
+    # disable print lastlog when login
+    sed -i -e "1,/#PrintLastLog yes/{s/#PrintLastLog yes/PrintLastLog no/}" /etc/ssh/sshd_config
+
+    # set root user empty password
+    passwd -d root
+}
+
 function setupWelcome()
 {
     cp /dnmp/src/welcome.sh /etc/update-motd.d/93-welcome
@@ -99,6 +113,7 @@ function install() {
     installRedis
     installCron
     installSupervisor
+    installSsh
     setupWelcome
     cleanup
 }

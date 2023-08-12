@@ -31,6 +31,7 @@ class SetupContainer
         $this->setupRedis();
         $this->setupCronJob();
         $this->setupSupervisor();
+        $this->setupSsh();
     }
 
     public function setupPhp()
@@ -240,6 +241,12 @@ class SetupContainer
 
         $this->executeCommand('service supervisor start', true, true);
         $this->echo("supervisor\t(successful)\n", $this->SUCCESSFUL_COLOR);
+    }
+
+    public function setupSsh()
+    {
+        $this->executeCommand('service ssh start', true, true);
+        $this->echo("ssh\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
     }
 
     private function executeCommand($command, $redirectStdOutput = true, $getExitCode = false)

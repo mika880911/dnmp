@@ -2,7 +2,7 @@
 $SCRIPT_PATH=$PSScriptRoot
 $CONFIG_PATH="$SCRIPT_PATH/config.json"
 $CONFIG_VERSION="1.7.0"
-$IMAGE_VERSION="1.7.0"
+$IMAGE_VERSION="1.8.0"
 ############### Global Variable End ##############
 
 
@@ -250,6 +250,18 @@ function setupIp()
     }
 }
 
+function cleanupFingerprint()
+{
+    $port = getJsonValue $CONFIG_PATH 'ports[] | select(.container == \"22\" and .enabled == true) | (.local)'
+    $ip = getJsonValue $CONFIG_PATH "ip"
+    $ips=$ip, "localhost", "127.0.0.1"
+
+    foreach ($ip in $ips) {
+        $command = "ssh-keygen -R [$ip]:$port 2>&1 | Out-Null";
+        Invoke-Expression $command;
+    }
+}
+
 function startContainer()
 {
     $command = "docker run --rm -it"
@@ -282,7 +294,7 @@ function startContainer()
 function main()
 {
     printText "======= Setup Local Env =======" "FYELLOW"
-    $methods="checkIsAdmin", "checkDockerIsReady", "setupStructure", "setupTrustedCa", "checkVersionCompatibility", "setupHosts", "setupIp"
+    $methods="checkIsAdmin", "checkDockerIsReady", "setupStructure", "setupTrustedCa", "checkVersionCompatibility", "setupHosts", "setupIp", "cleanupFingerprint"
     foreach ($method in $methods) {
         $result=&$method
         if ($result -eq 1) {

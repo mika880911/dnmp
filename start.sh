@@ -4,7 +4,7 @@
 SCRIPT_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P);
 CONFIG_PATH="${SCRIPT_PATH}/config.json";
 CONFIG_VERSION="1.7.0";
-IMAGE_VERSION="1.7.0";
+IMAGE_VERSION="1.8.0";
 ############### Global Variable End ##############
 
 
@@ -290,6 +290,24 @@ function setupIp()
     fi
 }
 
+function cleanupFingerprint()
+{
+    getJsonValue ${CONFIG_PATH} 'ports[] | select(.container == "22" and .enabled == true) | (.local)';
+    local port=${result};
+
+    getJsonValue ${CONFIG_PATH} "ip";
+    local ips="
+        ${result}
+        localhost
+        127.0.0.1
+    ";
+
+    for ip in ${ips}
+    do
+        eval "ssh-keygen -R [${ip}]:${port} > /dev/null 2>&1";
+    done
+}
+
 function startContainer()
 {
     local command="${sudo} docker run --rm -it";
@@ -332,6 +350,7 @@ function main()
         checkVersionCompatibility
         setupHosts
         setupIp
+        cleanupFingerprint
         startContainer
     ";
 
