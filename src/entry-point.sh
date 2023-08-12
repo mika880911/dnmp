@@ -1,6 +1,7 @@
 #!/bin/bash
 
-function main() {
+function main()
+{
     php8.2 /dnmp/src/SetupContainer.php
     bash
 }

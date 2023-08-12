@@ -239,7 +239,8 @@ function checkVersionCompatibility()
     return 0;
 }
 
-function setupHosts() {
+function setupHosts()
+{
     getJsonValue ${CONFIG_PATH} 'sites[] | (.domain) + ";" + (.auto_host | tostring)';
     local sitesSetting domain autoHost;
 
@@ -289,7 +290,8 @@ function setupIp()
     fi
 }
 
-function startContainer() {
+function startContainer()
+{
     local command="${sudo} docker run --rm -it";
 
     # mapping ports
