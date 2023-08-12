@@ -280,6 +280,9 @@ function startContainer()
     # mapping dnmp
     $command = "$command -v ${SCRIPT_PATH}:/dnmp"
 
+    # mapping home directory
+    $command = "$command -v ${SCRIPT_PATH}/datas/home:/root"
+
     # container name
     $command = "$command --name dnmp"
 
