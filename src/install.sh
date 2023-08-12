@@ -80,6 +80,12 @@ function installSupervisor() {
     apt install -y supervisor
 }
 
+function setupWelcome()
+{
+    cp /dnmp/src/welcome.sh /etc/update-motd.d/93-welcome
+    chmod 755 /etc/update-motd.d/93-welcome
+}
+
 function cleanup() {
     rm -rf /dnmp
 }
@@ -93,6 +99,7 @@ function install() {
     installRedis
     installCron
     installSupervisor
+    setupWelcome
     cleanup
 }
 
