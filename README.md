@@ -26,7 +26,7 @@ LNMP of Docker Version
 ## Basic
 1. clone project
     ```sh
-    git clone https://github.com/ntut-mika/dnmp.git
+    git clone https://github.com/mika880911/dnmp.git
     ```
 
 2. start container
