@@ -1,6 +1,7 @@
 #!/bin/bash
 
-function installUtils() {
+function installUtils()
+{
     apt update
     DEBIAN_FRONTEND="noninteractive" apt install -y vim zip unzip wget curl git software-properties-common
     add-apt-repository -y ppa:ondrej/php
@@ -8,7 +9,8 @@ function installUtils() {
     update-ca-certificates
 }
 
-function installNginx() {
+function installNginx()
+{
     apt install -y nginx
 
     # remove exist site config
@@ -16,7 +18,8 @@ function installNginx() {
     rm -rf /etc/nginx/sites-enabled/*
 }
 
-function installMysql() {
+function installMysql()
+{
     apt install -y mysql-server
 
     # enable remote connect
@@ -36,7 +39,8 @@ function installMysql() {
     rm -rf /var/lib/mysql
 }
 
-function installPhp() {
+function installPhp()
+{
     for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1 8.2
     do
         apt install -y php${version} php${version}-fpm
@@ -57,14 +61,16 @@ function installPhp() {
     done
 }
 
-function installComposer() {
+function installComposer()
+{
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
     php composer-setup.php
     php -r "unlink('composer-setup.php');"
     mv composer.phar /usr/bin/composer
 }
 
-function installRedis() {
+function installRedis()
+{
     apt install -y redis-server
 
     # enable remote connect
@@ -72,15 +78,18 @@ function installRedis() {
     sed -i -e "1,/protected-mode yes/{s/protected-mode yes/protected-mode no/}" /etc/redis/redis.conf
 }
 
-function installCron() {
+function installCron()
+{
     apt install -y cron
 }
 
-function installSupervisor() {
+function installSupervisor()
+{
     apt install -y supervisor
 }
 
-function installSsh() {
+function installSsh()
+{
     apt install -y openssh-server
 
     # enable empty root connect
@@ -100,11 +109,13 @@ function setupWelcome()
     chmod 755 /etc/update-motd.d/93-welcome
 }
 
-function cleanup() {
+function cleanup()
+{
     rm -rf /dnmp
 }
 
-function install() {
+function install()
+{
     installUtils
     installNginx
     installMysql
@@ -118,7 +129,8 @@ function install() {
     cleanup
 }
 
-function main() {
+function main()
+{
     install
 }
 
