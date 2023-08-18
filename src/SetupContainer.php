@@ -2,6 +2,8 @@
 
 namespace Mika\Dnmp;
 
+use function PHPSTORM_META\map;
+
 class SetupContainer
 {
     protected $ERROR_COLOR        = "\033[0;31m";
@@ -23,6 +25,7 @@ class SetupContainer
     {
         $this->echo("======= Setup Container Env =======\n", $this->INFO_COLOR);
         $this->setupPhp();
+        $this->setupPhpUnit();
         $this->setupComposer();
         $this->setupSSL();
         $this->setupHosts();
@@ -77,6 +80,26 @@ class SetupContainer
         } else {
             $this->echo("php({$phpCliVersion})\t(failed: version not allow)\n", $this->ERROR_COLOR);
         }
+    }
+
+    public function setupPhpUnit()
+    {
+        $map = [
+            '5.6' => '5',
+            '7.0' => '6',
+            '7.1' => '7',
+            '7.2' => '8',
+            '7.3' => '9',
+            '7.4' => '9',
+            '8.0' => '9',
+            '8.1' => '10',
+            '8.2' => '10'
+        ];
+
+        $phpunitVeersion = $map[$this->config['php_cli_version']];
+
+        $this->executeCommand("ln -s /usr/bin/phpunit{$phpunitVeersion} /usr/bin/phpunit");
+        $this->echo("phpunit({$phpunitVeersion})\t(successful)\n", $this->SUCCESSFUL_COLOR);
     }
 
     public function setupComposer()

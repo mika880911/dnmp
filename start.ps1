@@ -2,7 +2,7 @@
 $SCRIPT_PATH=$PSScriptRoot
 $CONFIG_PATH="$SCRIPT_PATH/config.json"
 $CONFIG_VERSION="1.7.0"
-$IMAGE_VERSION="1.8.0"
+$IMAGE_VERSION="1.9.0"
 ############### Global Variable End ##############
 
 

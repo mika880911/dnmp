@@ -61,6 +61,23 @@ function installPhp()
     done
 }
 
+function installPhpUnit()
+{
+    wget https://phar.phpunit.de/phpunit-4.8.phar -O phpunit4
+    wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit5
+    wget https://phar.phpunit.de/phpunit-6.5.phar -O phpunit6
+    wget https://phar.phpunit.de/phpunit-7.5.phar -O phpunit7
+    wget https://phar.phpunit.de/phpunit-8.5.phar -O phpunit8
+    wget https://phar.phpunit.de/phpunit-9.6.phar -O phpunit9
+    wget https://phar.phpunit.de/phpunit-10.3.phar -O phpunit10
+
+    for version in 4 5 6 7 8 9 10
+    do
+        chmod +x phpunit${version}
+        mv ./phpunit${version} /usr/bin/
+    done
+}
+
 function installComposer()
 {
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -120,6 +137,7 @@ function install()
     installNginx
     installMysql
     installPhp
+    installPhpUnit
     installComposer
     installRedis
     installCron

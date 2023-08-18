@@ -9,15 +9,17 @@ LNMP of Docker Version
 - nginx：latest
 - redis：latest
 - php
-    - 5.6
-    - 7.0
-    - 7.1
-    - 7.2
-    - 7.3
-    - 7.4
-    - 8.0
-    - 8.1
-    - 8.2
+    | php     | phpunit |
+    |---------|---------|
+    | 5.6     | 5       |
+    | 7.0     | 6       |
+    | 7.1     | 7       |
+    | 7.2     | 8       |
+    | 7.3     | 9       |
+    | 7.4     | 9       |
+    | 8.0     | 9       |
+    | 8.1     | 10      |
+    | 8.2     | 10      |
 - ssh
 
 ## Environment Required
