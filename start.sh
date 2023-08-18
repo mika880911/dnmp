@@ -224,6 +224,7 @@ function checkVersionCompatibility()
     do
         if ! [[ $(${sudo} docker images dnmp:${IMAGE_VERSION} --format {{.Repository}}:{{.Tag}}) == "dnmp:${IMAGE_VERSION}" ]]; then
             if [[ $i == 0 ]]; then
+                cleanupFingerprint
                 # buildImage;
                 ${sudo} docker rmi $(${sudo} docker images dnmp -q) 2>/dev/null;
                 ${sudo} docker build -t dnmp:${IMAGE_VERSION} ${SCRIPT_PATH}/src --no-cache;
@@ -353,7 +354,6 @@ function main()
         checkVersionCompatibility
         setupHosts
         setupIp
-        cleanupFingerprint
         startContainer
     ";
 
