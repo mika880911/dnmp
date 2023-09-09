@@ -2,8 +2,6 @@
 
 namespace Mika\Dnmp;
 
-use function PHPSTORM_META\map;
-
 class SetupContainer
 {
     protected $ERROR_COLOR        = "\033[0;31m";
@@ -107,7 +105,7 @@ class SetupContainer
         $composerVersion    = $this->config['composer_version'];
         $availableVersion   = [1, 2];
 
-        $this->executeCommand('new_path="export PATH=\"\$HOME/.config/composer/vendor/bin:\$PATH\""; bashrc_file="$HOME/.bashrc"; if ! cat "$bashrc_file" > /dev/null 2>&1 | grep -qF "$new_path"; then echo "$new_path" >> "$bashrc_file";fi', false);
+        $this->executeCommand('new_path=\'export PATH="$HOME/.config/composer/vendor/bin:$PATH"\' && bashrc_file="$HOME/.bashrc" && grep -qF "$new_path" "$bashrc_file" || echo "$new_path" >> "$bashrc_file"', false);
 
         if (in_array($composerVersion, $availableVersion)) {
             $this->executeCommand("composer self-update --{$composerVersion}");
