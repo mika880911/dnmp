@@ -200,6 +200,8 @@ class SetupContainer
 
     public function setupMysql()
     {
+        $this->executeCommand('rm -f /dnmp/datas/database/*.pid');
+
         if (count(scandir('/var/lib/mysql')) == 2) {
             $this->executeCommand("bash {$this->baseDir}/src/initializeMysql.sh");
         } else {
@@ -211,6 +213,8 @@ class SetupContainer
         } else {
             $this->echo("mysql\t\t(failed: can't start mysql server, delete the data/database directory may fix this problem)\n", $this->ERROR_COLOR);
         }
+
+        $this->executeCommand('mysql -u root -Bse "reset master"');
     }
 
     public function setupRedis()
