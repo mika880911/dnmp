@@ -4,7 +4,7 @@
 SCRIPT_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P);
 CONFIG_PATH="${SCRIPT_PATH}/config.json";
 CONFIG_VERSION="1.7.0";
-IMAGE_VERSION="1.9.0";
+IMAGE_VERSION="1.10.0";
 ############### Global Variable End ##############
 
 
