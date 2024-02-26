@@ -41,7 +41,7 @@ function installMysql()
 
 function installPhp()
 {
-    for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1 8.2
+    for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1 8.2 8.3
     do
         apt install -y php${version} php${version}-fpm
         DEBIAN_FRONTEND="noninteractive" apt install -y \
@@ -72,7 +72,7 @@ function installPhpUnit()
     wget https://phar.phpunit.de/phpunit-9.6.phar -O phpunit9
     wget https://phar.phpunit.de/phpunit-10.3.phar -O phpunit10
 
-    for version in 4 5 6 7 8 9 10
+    for version in 4 5 6 7 8 9 10 11
     do
         chmod +x phpunit${version}
         mv ./phpunit${version} /usr/bin/

@@ -39,7 +39,7 @@ class SetupContainer
     {
         // setup php-cli version
         $phpCliVersion = $this->config['php_cli_version'];
-        $availableVersion = ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2'];
+        $availableVersion = ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3'];
 
         $cliIni       = file_get_contents("{$this->baseDir}/datas/templates/php/php-cli.ini");
         $fpmIni       = file_get_contents("{$this->baseDir}/datas/templates/php/php-fpm.ini");
@@ -91,7 +91,8 @@ class SetupContainer
             '7.4' => '9',
             '8.0' => '9',
             '8.1' => '10',
-            '8.2' => '10'
+            '8.2' => '11',
+            '8.3' => '11'
         ];
 
         $phpunitVeersion = $map[$this->config['php_cli_version']];
