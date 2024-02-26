@@ -44,7 +44,7 @@ function installPhp()
     for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1 8.2
     do
         apt install -y php${version} php${version}-fpm
-        apt install -y \
+        DEBIAN_FRONTEND="noninteractive" apt install -y \
         php${version}-zip \
         php${version}-xml \
         php${version}-mysql \
@@ -55,6 +55,7 @@ function installPhp()
         php${version}-imagick \
         php${version}-mbstring \
         php${version}-xdebug \
+        php${version}-intl
 
         # start php-fpm first, if never started call restart will not working
         service php${version}-fpm start
