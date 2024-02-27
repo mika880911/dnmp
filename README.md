@@ -19,7 +19,8 @@ LNMP of Docker Version
     | 7.4     | 9       |
     | 8.0     | 9       |
     | 8.1     | 10      |
-    | 8.2     | 10      |
+    | 8.2     | 11      |
+    | 8.3     | 11      |
 - ssh
 
 ## Environment Required
