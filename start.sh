@@ -226,7 +226,7 @@ function checkVersionCompatibility()
             if [[ $i == 0 ]]; then
                 cleanupFingerprint
                 # buildImage;
-                # ${sudo} docker rmi $(${sudo} docker images dnmp -q) 2>/dev/null;
+                ${sudo} docker rmi $(${sudo} docker images dnmp -q) 2>/dev/null;
                 ${sudo} docker build -t dnmp:${IMAGE_VERSION} ${SCRIPT_PATH}/src --no-cache;
             else
                 printText "version\t\t(failed: build dnmp:${IMAGE_VERSION} image error)" "FRED";
