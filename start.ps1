@@ -286,6 +286,9 @@ function startContainer()
     # mapping home directory
     $command = "$command -v ${SCRIPT_PATH}/datas/home:/root"
 
+    # mongodb need to setup this options
+    $command = "$command --ulimit memlock=-1"
+
     # container name
     $command = "$command --name dnmp"
 
