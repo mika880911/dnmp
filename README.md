@@ -6,6 +6,7 @@ LNMP of Docker Version
 - mysql：latest
     - account：root
     - password：
+- mongodb: 7.x
 - nginx：latest
 - redis：latest
 - php
@@ -22,7 +23,6 @@ LNMP of Docker Version
     | 8.2     | 11      |
     | 8.3     | 11      |
 - ssh
-
 ## Environment Required
 - [Docker](https://www.docker.com/)
 

@@ -2,7 +2,7 @@
 $SCRIPT_PATH=$PSScriptRoot
 $CONFIG_PATH="$SCRIPT_PATH/config.json"
 $CONFIG_VERSION="1.7.0"
-$IMAGE_VERSION="1.10.0"
+$IMAGE_VERSION="1.11.0"
 ############### Global Variable End ##############
 
 
@@ -276,6 +276,9 @@ function startContainer()
 
     # mapping database
     $command = "$command -v $SCRIPT_PATH/datas/database:/var/lib/mysql"
+
+    # mapping mongodb
+    $command = "$command -v $SCRIPT_PATH/datas/mongodb:/var/lib/mongodb"
 
     # mapping dnmp
     $command = "$command -v ${SCRIPT_PATH}:/dnmp"

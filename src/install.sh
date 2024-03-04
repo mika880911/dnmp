@@ -39,6 +39,22 @@ function installMysql()
     rm -rf /var/lib/mysql
 }
 
+function installMongoDB()
+{
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+    apt update
+    apt install -y mongodb-org
+
+    # enable remobe connect
+    sed -i -e "1,/bindIp: 127.0.0.1/{s/bindIp: 127.0.0.1/bindIp: 0.0.0.0/}" /etc/mongod.conf
+
+    # fixed mongod service not exist
+    wget https://raw.githubusercontent.com/mongodb/mongo/r7.0.6/debian/init.d -O /etc/init.d/mongod
+    sed -i -e "s/-mongodb/-root/g" /etc/init.d/mongod
+    chmod 755 /etc/init.d/mongod
+}
+
 function installPhp()
 {
     for version in 5.6 7.0 7.1 7.2 7.3 7.4 8.0 8.1 8.2 8.3
@@ -55,7 +71,8 @@ function installPhp()
         php${version}-imagick \
         php${version}-mbstring \
         php${version}-xdebug \
-        php${version}-intl
+        php${version}-intl \
+        php${version}-mongodb
 
         # start php-fpm first, if never started call restart will not working
         service php${version}-fpm start
@@ -130,6 +147,7 @@ function install()
     installUtils
     installNginx
     installMysql
+    installMongoDB
     installPhp
     installPhpUnit
     installComposer

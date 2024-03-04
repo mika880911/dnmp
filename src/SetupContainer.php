@@ -29,6 +29,7 @@ class SetupContainer
         $this->setupHosts();
         $this->setupNginx();
         $this->setupMysql();
+        $this->setupMongoDB();
         $this->setupRedis();
         $this->setupCronJob();
         $this->setupSupervisor();
@@ -216,6 +217,17 @@ class SetupContainer
         }
 
         $this->executeCommand('mysql -u root -Bse "reset master"');
+    }
+
+    public function setupMongoDB()
+    {
+        $this->executeCommand('service mongod start');
+
+        if ($this->executeCommand('service mongod status', true, true) == 0) {
+            $this->echo("mongodb\t\t(successful)\n", $this->SUCCESSFUL_COLOR);
+        } else {
+            $this->echo("mongodb\t\t(failed: can't start mongodb server, delete the data/mongodb directory may fix this problem)\n", $this->ERROR_COLOR);
+        }
     }
 
     public function setupRedis()

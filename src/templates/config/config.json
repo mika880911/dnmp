@@ -58,6 +58,11 @@
             "enabled": true,
             "local": "8222",
             "container": "22"
+        },
+        {
+            "enabled": true,
+            "local": "27017",
+            "container": "27017"
         }
     ],
     "xdebug": {

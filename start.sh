@@ -4,7 +4,7 @@
 SCRIPT_PATH=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P);
 CONFIG_PATH="${SCRIPT_PATH}/config.json";
 CONFIG_VERSION="1.7.0";
-IMAGE_VERSION="1.10.0";
+IMAGE_VERSION="1.11.0";
 ############### Global Variable End ##############
 
 
@@ -226,7 +226,7 @@ function checkVersionCompatibility()
             if [[ $i == 0 ]]; then
                 cleanupFingerprint
                 # buildImage;
-                ${sudo} docker rmi $(${sudo} docker images dnmp -q) 2>/dev/null;
+                # ${sudo} docker rmi $(${sudo} docker images dnmp -q) 2>/dev/null;
                 ${sudo} docker build -t dnmp:${IMAGE_VERSION} ${SCRIPT_PATH}/src --no-cache;
             else
                 printText "version\t\t(failed: build dnmp:${IMAGE_VERSION} image error)" "FRED";
@@ -324,11 +324,17 @@ function startContainer()
     # mapping database
     command="${command} -v ${SCRIPT_PATH}/datas/database:/var/lib/mysql";
 
+    # mapping mongodb
+    command="${command} -v ${SCRIPT_PATH}/datas/mongodb:/var/lib/mongodb";
+
     # mapping dnmp
     command="${command} -v ${SCRIPT_PATH}:/dnmp";
 
     # mapping home directory
     command="${command} -v ${SCRIPT_PATH}/datas/home:/root";
+
+    # mongodb need to setup this options
+    command="${command} --ulimit memlock=-1";
 
     # container name
     command="${command} --name dnmp";
